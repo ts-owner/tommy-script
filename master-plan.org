@@ -1,1 +1,60 @@
-* This is a plan!
+* Style, Language, etc...
+** TODO [#A] Decide on the lanugage we're writng the interpreter in
+** TODO [#B] Agree on a consistent style
+
+
+* Backend (Interpreted, Compiled, VM)
+** Start off interpreted
+** TODO [#C] Look into VM
+*** Graal/Truffle
+*** ZetaVM
+*** LLVM
+*** +JVM+
+*** +Racket VM+
+** If/When we move on from interpreting, we'll do a VM, not straight to native
+
+
+* Type System
+** So we have to have some sort of types
+*** But should they be exposed to the users?
+** We should have ints, floats, and strings
+** Parametric polymorphism
+** Algebraic Data Types, probably
+** Type inference!!!!! wooohoo
+** Contracts?
+** TODO [#A] Decide on Contracts/Actual types & ADTs
+
+
+* Important Misc. Features
+** Modules
+** Closures & lambdas
+** File IO
+
+* Quirks
+** Have easy to use dicts
+*** Would be easier to implement/use with contracts
+*** Row polymorphism
+** Macros
+*** Super hard to implement
+*** Super hard to use (well)
+** Record accessors functions (or similar)
+*** How not to pollute namespace?
+** UCFS
+** Classes?
+*** OO
+** Record updates
+** Pattern Matching
+** Literate programming
+** Async stuff
+*** async/await?
+*** Continuations
+** Threads?????????!!!!!
+*** Let's copy python and lie
+** Regex literals
+
+* [#C] Syntax
+** Easy syntax for built in data structures
+*** Slices?
+
+* Goals
+** Be able to do a (high school) programming competition question
