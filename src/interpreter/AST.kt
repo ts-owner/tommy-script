@@ -1,3 +1,5 @@
+package interpreter
+
 sealed class Type
 
 object TInt : Type()
@@ -25,30 +27,34 @@ enum class InOp(val asText : String, val type : TFunction) {
      override fun toString() = asText
 }
 
-data class AnnotatedVar(val name : String, val ty : Type)
+data class AnnotatedVar(val id : String, val ty : Type)
 
 sealed class AST
 
-abstract class Expression : AST()
+sealed class Expression : AST()
 typealias Expr = Expression
-abstract class Statement : AST()
-typealias Body = List<Statement>
 
-// Literals
-data class Var(val name : String) : Expr()
-data class LInt(val value: Int) : Expr()
-data class LString(val value: String) : Expr()
-data class LBool(val value: Boolean) : Expr()
-object LUnit : Expr()
+data class Var(val id : String) : Expr()
 
 // Recursive expression constructors
 data class Prefix(val op : PreOp, val expr : Expr) : Expr()
 data class Infix(val op : InOp, val lhs : Expr, val rhs : Expr) : Expr()
-data class FunCall(val function : String, val args : List<String>) : Expr()
+data class FunCall(val id : String, val args : List<String>) : Expr()
+
+// Literals
+sealed class Literal(val ty : Type) : Expr()
+
+data class LInt(val value: Int) : Literal(TInt)
+data class LString(val value: String) : Literal(TString)
+data class LBool(val value: Boolean) : Literal(TBool)
+object LUnit : Literal(TUnit)
+
+sealed class Statement : AST()
+typealias Body = List<Statement>
 
 // Statements
 data class If(val cond : Expr, val thenBranch : Body, val elseBranch : Body? = null) : Statement()
 data class VarDef(val lhs : AnnotatedVar, val rhs : Expr) : Statement()
-data class FunDef(val name : String, val args : List<AnnotatedVar>, val returnType : Type,
+data class FunDef(val id : String, val args : List<AnnotatedVar>, val returnType : Type,
                   val statements : Body) : Statement()
 data class Return(val toReturn : Expr) : Statement()
