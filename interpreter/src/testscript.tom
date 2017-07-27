@@ -1,8 +1,9 @@
 let x: String = "test"
-let y = 13
+let y: String = 13
 let multiply(a: Int, b: Int) =
     if a==b then
         return a**2
     end
     return (a * b)
 end
+print(multiply(1, 6 + 9))
