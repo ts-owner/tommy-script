@@ -1,11 +1,10 @@
-import java.io.File
+package interpreter
+
+import kotlin.test.assertEquals
+import kotlin.test.assertFails
 
 fun main(args: Array<String>) {
-    val testScript : File = File("src/testscript.tom")
-
-    if (testScript.isFile) {
-        testScript.forEachLine { println(it) }
-    } else {
-        println(testScript.exists())
-    }
+    var testExpression = Infix(InOp.plus, LInt(1), Prefix(PreOp.negate, Var("a")))
+    assertEquals(TInt, typeInfer(mapOf("a" to TInt), testExpression))
+    assertFails { typeInfer(mapOf("a" to TBool), testExpression) }
 }
