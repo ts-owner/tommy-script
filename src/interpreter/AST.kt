@@ -39,7 +39,7 @@ data class Var(val id : String) : Expr()
 // Recursive expression constructors
 data class Prefix(val op : PreOp, val expr : Expr) : Expr()
 data class Infix(val op : InOp, val lhs : Expr, val rhs : Expr) : Expr()
-data class FunCall(val id : String, val args : List<String>) : Expr()
+data class FunCall(val id : String, val args : List<Expr>) : Expr()
 
 // Literals
 sealed class Literal(val ty : Type) : Expr()
