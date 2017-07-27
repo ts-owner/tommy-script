@@ -1,10 +1,11 @@
-import java.io.File;
-fun main(args: Array<String>) {
-    var testscript = File("src/testscript.tom")
-    if (testscript.isFile) {
-        var lines = testscript.readLines()
-    } else {
-        println(testscript.exists())
-    }
+import java.io.File
 
+fun main(args: Array<String>) {
+    val testScript : File = File("src/testscript.tom")
+
+    if (testScript.isFile) {
+        testScript.forEachLine { println(it) }
+    } else {
+        println(testScript.exists())
+    }
 }
