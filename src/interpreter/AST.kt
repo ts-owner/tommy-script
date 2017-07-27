@@ -2,18 +2,20 @@ package interpreter
 
 sealed class Type
 
-object TInt : Type()
-object TString : Type()
-object TBool : Type()
-object TUnit : Type()
-data class TFunction(val dom : List<Type>, val cod : Type) : Type()
+object TInt : Type() { override fun toString() = "Int" }
+object TString : Type() { override fun toString() = "String" }
+object TBool : Type() { override fun toString() = "Bool" }
+object TUnit : Type() { override fun toString() = "Unit" }
+data class TFunction(val dom : List<Type>, val cod : Type) : Type() {
+     override fun toString() = "(${dom.joinToString()}) → $cod"
+}
 
 fun opType(n : Int, ty : Type) = TFunction(List(n, { ty }), ty)
 fun relationOn(n : Int, ty : Type) = TFunction(List(n, { ty }), TBool)
 
 enum class PreOp(val asText : String, val type : TFunction) {
-     plus("+", relationOn(1, TInt)), negate("-", relationOn(1, TInt)),
-     not("not", relationOn(1, TBool));
+     plus("+", opType(1, TInt)), negate("-", opType(1, TInt)),
+     not("not", opType(1, TBool));
 
      override fun toString() = asText
 }
@@ -47,7 +49,7 @@ sealed class Literal(val ty : Type) : Expr()
 data class LInt(val value: Int) : Literal(TInt)
 data class LString(val value: String) : Literal(TString)
 data class LBool(val value: Boolean) : Literal(TBool)
-object LUnit : Literal(TUnit)
+object LUnit : Literal(TUnit) { override fun toString() = "unit" }
 
 sealed class Statement : AST()
 typealias Body = List<Statement>
