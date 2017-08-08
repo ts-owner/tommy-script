@@ -56,7 +56,7 @@ typealias Body = List<Statement>
 
 // Statements
 data class If(val cond : Expr, val thenBranch : Body, val elseBranch : Body? = null) : Statement()
-data class VarDef(val lhs : AnnotatedVar, val rhs : Expr) : Statement()
+data class VarDef(val lhs : AnnotatedVar, val rhs : Expr) : Statement() //TODO annotations should be optional
 data class FunDef(val id : String, val args : List<AnnotatedVar>, val returnType : Type,
                   val statements : Body) : Statement()
 data class Return(val toReturn : Expr) : Statement()
