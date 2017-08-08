@@ -1,2 +1,2 @@
-let x: String = 123
+let x: String = "flipster"
 let y: Int = 13

@@ -10,6 +10,7 @@ import com.github.h0tk3y.betterParse.parser.ParseResult
 import com.github.h0tk3y.betterParse.parser.Parser
 import com.github.h0tk3y.betterParse.parser.parseToEnd
 import java.io.File
+import java.util.function.LongBinaryOperator
 import kotlin.test.assertEquals
 import kotlin.test.assertFails
 
@@ -31,11 +32,34 @@ fun main(args: Array<String>) {
             "Unit" to TUnit)
 
     class TommyParser : Grammar<List<AST>>() {
-        val num by token("\\d+")
-
+        //Symbols
+        val LPAR by token("\\(")
+        val RPAR by token("\\)")
         val COLON by token(":")
         val LET by token("let")
         val EQUALS by token("=")
+        val PLUS by token("\\+")
+        val MINUS by token("\\-")
+        val DIV by token("/")
+        val MOD by token("%")
+        val TIMES by token("\\*")
+        val OR by token("or")
+        val AND by token("and")
+        val EQU by token("==")
+        val NEQ by token("!=")
+        val LEQ by token("<=")
+        val GEQ by token(">=")
+        val LT by token("<")
+        val GT by token(">")
+        val NOT by token("not")
+        val COMMA by token(",")
+        val RETURN by token("return")
+
+        //Literals
+        val NUM by token("\\d+")
+        val STRING by token("\".*?\"") //TODO support escape characters
+        val TRUE by token("true")
+        val FALSE by token("false")
 
         //types
         val stringSymbol by token("String")
@@ -45,12 +69,20 @@ fun main(args: Array<String>) {
         val id by token("\\w+")
 
         val ws by token("\\s+",ignore = true)
+        //LEXER OVER
+
 
         val type = stringSymbol or intSymbol or boolSymbol use {
             dirtyConverter[text]!!
         }
+        val stringParser = STRING use { LString(text.substring(1,text.length-1))}
+        val numParser = NUM use { LInt(text.toInt()) }
+        val trueParser = TRUE use { LBool(true) }
+        val falseParser = FALSE use { LBool(false) }
+        val literalParser = stringParser or numParser or trueParser or falseParser
 
-        val numParser = num use { LInt(text.toInt()) }
+        val expr = literalParser //TODO expand on this
+
         val idParser = id use { text }
 
         //TODO num should be expr
@@ -58,13 +90,14 @@ fun main(args: Array<String>) {
             (a,b)-> AnnotatedVar(a,b)
         }
 
-        val varDefParser = -LET and annotatedVarParser and -EQUALS and numParser map {
+        val varDefParser = -LET and annotatedVarParser and -EQUALS and expr map {
             (a,b)-> VarDef(a,b)
         }
-        override val rootParser: Parser<List<AST>> = oneOrMore(varDefParser)
+        override val rootParser: Parser<List<AST>> = oneOrMore(varDefParser) //TODO make this correct
              //To change initializer of created properties use File | Settings | File Templates.
     }
     var result = TommyParser().tryParseToEnd(exampleScript.inputStream())
     println(result)
 
 }
+//TODO do all of the above todos, then do in/preops, then do control flow
