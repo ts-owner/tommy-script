@@ -1,0 +1,2 @@
+let x: String = "test"
+let y: Int = 13
