@@ -1,2 +1,5 @@
 let x: String = "flipster"
+let func(x:String)
+
+end
 let y: Int = 13

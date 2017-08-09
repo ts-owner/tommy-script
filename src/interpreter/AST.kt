@@ -52,11 +52,14 @@ data class LBool(val value: Boolean) : Literal(TBool)
 object LUnit : Literal(TUnit) { override fun toString() = "unit" }
 
 sealed class Statement : AST()
-typealias Body = List<Statement>
+//typealias Body = List<Statement> //TODO @Brendan should't this be List<AST> so you can have funcalls in body
+typealias Body = List<AST> //potentially temporary change to make parser work
+
 
 // Statements
 data class If(val cond : Expr, val thenBranch : Body, val elseBranch : Body? = null) : Statement()
 data class VarDef(val lhs : AnnotatedVar, val rhs : Expr) : Statement() //TODO annotations should be optional
+data class UntypedVarDef(val lhs : Var, val rhs : Expr) : Statement() //TODO @Brendan this is ugly maybe there's a cleaner way
 data class FunDef(val id : String, val args : List<AnnotatedVar>, val returnType : Type,
                   val statements : Body) : Statement()
 data class Return(val toReturn : Expr) : Statement()
