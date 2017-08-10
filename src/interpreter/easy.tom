@@ -1,5 +1,5 @@
 let x: String = "flipster"
-let func(x:String)
-
-end
+let x = 3
+x = 4
+y = "asdasd"
 let y: Int = 13

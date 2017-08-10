@@ -82,29 +82,30 @@ fun main(args: Array<String>) {
         val funCallParser = id and -LPAR and separatedTerms(parser(this::expr),COMMA,acceptZero = true) and -RPAR map {
             (name, args) -> FunCall(name.text,args)
         }
-        val varParser = id use {Var(text)}
+        val varParser = idParser map {Var(it)}
 
         val expr: Parser<Expr> = literalParser or funCallParser or varParser
 
 
         //TODO num should be expr
         val annotatedVarParser = idParser and -COLON and type map {
-            (a,b)-> AnnotatedVar(a,b)
+            (a,b) -> AnnotatedVar(a,b)
         }
 
         val varDefParser = -LET and annotatedVarParser and -EQUALS and expr map {
-            (a,b)-> VarDef(a,b)
+            (a,b) -> VarDef(a,b)
         }
-        val untypedVarDefParser = -LET and varParser and -EQUALS and expr map {
-            (a,b)->UntypedVarDef(a,b)
+
+        val untypedVarDefParser = -optional(LET) and varParser and -EQUALS and expr map {
+            (a,b) -> UntypedVarDef(a,b)
         }
         /*val funDefParser = -LET * idParser * -LPAR * separatedTerms(annotatedVarParser,
                 COMMA, acceptZero = true) * -RPAR * -COLON * type * -EQUALS * zeroOrMore(parser(this::astParser)) * -END map {
             (a, b, c, d) -> FunDef(a,b,c,d)
         }*/
 
-        val funDefParser = -LET * idParser *-LPAR * -separatedTerms(annotatedVarParser,COMMA,acceptZero = true) * -RPAR * -END map {
-            FunDef(it, listOf(),TString,listOf())
+        val funDefParser = -LET * idParser *-LPAR * -separatedTerms(annotatedVarParser,COMMA,acceptZero = true) * -RPAR * -EQUALS * zeroOrMore(parser(this::astParser))* -END map {
+            (a,b)->FunDef(a, listOf(),TString,b)
         }
         //TODO if, fundef, return
         val statement : Parser<Statement> = varDefParser or untypedVarDefParser or funDefParser
