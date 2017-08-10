@@ -95,8 +95,12 @@ fun main(args: Array<String>) {
             (a,b) -> VarDef(a,b)
         }
 
-        val untypedVarDefParser = -optional(LET) and varParser and -EQUALS and expr map {
+        val untypedVarDefParser = -(LET) and varParser and -EQUALS and expr map {
             (a,b) -> UntypedVarDef(a,b)
+        }
+
+        val varReassignParser = varParser and -EQUALS and expr map {
+            (a,b) -> VarReassign(a,b)
         }
 
 
@@ -109,8 +113,8 @@ fun main(args: Array<String>) {
             (a,b)->FunDef(a, listOf(),TString,b)
         }
         //TODO if, fundef, return
-        val statement : Parser<Statement> = varDefParser or untypedVarDefParser or funDefParser
-        val astParser : Parser<AST> = statement or expr
+        val statement : Parser<Statement> = varDefParser or untypedVarDefParser or funDefParser or varReassignParser
+        val astParser : Parser<AST> = statement or expr //order matters here for assignment!
         override val rootParser: Parser<List<AST>> = oneOrMore(astParser) //TODO make this correct
              //To change initializer of created properties use File | Settings | File Templates.
     }
