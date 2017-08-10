@@ -84,10 +84,9 @@ fun main(args: Array<String>) {
         }
         val varParser = idParser map {Var(it)}
 
+
         val expr: Parser<Expr> = literalParser or funCallParser or varParser
 
-
-        //TODO num should be expr
         val annotatedVarParser = idParser and -COLON and type map {
             (a,b) -> AnnotatedVar(a,b)
         }
@@ -99,6 +98,8 @@ fun main(args: Array<String>) {
         val untypedVarDefParser = -optional(LET) and varParser and -EQUALS and expr map {
             (a,b) -> UntypedVarDef(a,b)
         }
+
+
         /*val funDefParser = -LET * idParser * -LPAR * separatedTerms(annotatedVarParser,
                 COMMA, acceptZero = true) * -RPAR * -COLON * type * -EQUALS * zeroOrMore(parser(this::astParser)) * -END map {
             (a, b, c, d) -> FunDef(a,b,c,d)
@@ -109,7 +110,7 @@ fun main(args: Array<String>) {
         }
         //TODO if, fundef, return
         val statement : Parser<Statement> = varDefParser or untypedVarDefParser or funDefParser
-        val astParser : Parser<AST> = expr or statement
+        val astParser : Parser<AST> = statement or expr
         override val rootParser: Parser<List<AST>> = oneOrMore(astParser) //TODO make this correct
              //To change initializer of created properties use File | Settings | File Templates.
     }
