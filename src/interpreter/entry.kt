@@ -70,7 +70,7 @@ fun main(args: Array<String>) {
 
         val idParser = id use { text }
 
-        val type = stringSymbol or intSymbol or boolSymbol use {
+        val typeParser = stringSymbol or intSymbol or boolSymbol use {
             dirtyConverter[text]!!
         }
 
@@ -87,7 +87,7 @@ fun main(args: Array<String>) {
 
         val expr: Parser<Expr> = literalParser or funCallParser or varParser
 
-        val annotatedVarParser = idParser and -COLON and type map {
+        val annotatedVarParser = idParser and -COLON and typeParser map {
             (a,b) -> AnnotatedVar(a,b)
         }
 
@@ -103,14 +103,8 @@ fun main(args: Array<String>) {
             (a,b) -> VarReassign(a,b)
         }
 
-
-        /*val funDefParser = -LET * idParser * -LPAR * separatedTerms(annotatedVarParser,
-                COMMA, acceptZero = true) * -RPAR * -COLON * type * -EQUALS * zeroOrMore(parser(this::astParser)) * -END map {
-            (a, b, c, d) -> FunDef(a,b,c,d)
-        }*/
-
-        val funDefParser = -LET * idParser *-LPAR * -separatedTerms(annotatedVarParser,COMMA,acceptZero = true) * -RPAR * -EQUALS * zeroOrMore(parser(this::astParser))* -END map {
-            (a,b)->FunDef(a, listOf(),TString,b)
+        val funDefParser = -LET * idParser *-LPAR * separatedTerms(annotatedVarParser, COMMA, acceptZero = true) * -RPAR * -COLON * typeParser * -EQUALS * zeroOrMore(parser(this::astParser))* -END map {
+            (funname,args,rettype, children) -> FunDef(funname, args,rettype,children)
         }
         //TODO if, fundef, return
         val statement : Parser<Statement> = varDefParser or untypedVarDefParser or funDefParser or varReassignParser
