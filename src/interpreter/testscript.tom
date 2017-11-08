@@ -1,6 +1,14 @@
 let x: String = "test"
 let y: String = 13
-let multiply(a: Int, b: Int) =
+let x = "asdasd"
+let x: String = "flipster"
+"asdasd"
+let x = 3
+let y: Int = 13
+y=4
+x="asdasd"
+
+let multiply(a: Int, b: Int):Int =
     if a==b then
         return a**2
     end

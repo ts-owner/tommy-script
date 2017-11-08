@@ -46,10 +46,15 @@ fun main(args: Array<String>) {
         val GEQ by token(">=")
         val LT by token("<")
         val GT by token(">")
-        val NOT by token("not\\b")
         val COMMA by token(",")
+
+        //keywords
+        val NOT by token("not\\b")
         val RETURN by token("return\\b")
         val END by token("end\\b")
+        val IF by token("if\\b")
+        val THEN by token("then\\b")
+        val ELSE by token("else\\b")
 
         //Literals
         val NUM by token("\\d+")
@@ -104,15 +109,24 @@ fun main(args: Array<String>) {
         }
 
         val funDefParser = -LET * idParser *-LPAR * separatedTerms(annotatedVarParser, COMMA, acceptZero = true) * -RPAR * -COLON * typeParser * -EQUALS * zeroOrMore(parser(this::astParser))* -END map {
-            (funname,args,rettype, children) -> FunDef(funname, args,rettype,children)
+            (funname, args, rettype, children) -> FunDef(funname, args, rettype, children)
+        }
+
+        val returnParser = -RETURN and expr map {
+            a -> Return(a)
+        }
+
+        val ifParser = -IF and expr and -THEN and zeroOrMore(parser(this::astParser)) and optional(-ELSE and zeroOrMore(parser(this::astParser))) and -END map {
+            (cond,body, elsebody)-> If(cond,body,elsebody)
         }
         //TODO if, fundef, return
-        val statement : Parser<Statement> = varDefParser or untypedVarDefParser or funDefParser or varReassignParser
+        val statement : Parser<Statement> = returnParser or varDefParser or untypedVarDefParser or funDefParser or varReassignParser or ifParser
         val astParser : Parser<AST> = statement or expr //order matters here for assignment!
         override val rootParser: Parser<List<AST>> = oneOrMore(astParser) //TODO make this correct
              //To change initializer of created properties use File | Settings | File Templates.
     }
     var result = TommyParser().tryParseToEnd(exampleScript.inputStream())
+    result.toString()
     TommyParser().parseToEnd(exampleScript.inputStream()).forEach {println(it)}
 
 }
