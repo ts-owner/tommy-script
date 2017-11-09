@@ -21,6 +21,7 @@ fun main(args: Array<String>) {
     var lines = exampleScript.readLines()
     println(lines)
 
+    //TODO fix this
     val dirtyConverter = mapOf("String" to TString,
             "Int" to TInt,
             "Bool" to TBool,
@@ -38,6 +39,8 @@ fun main(args: Array<String>) {
         val DIV by token("/")
         val MOD by token("%")
         val TIMES by token("\\*")
+        val CONCAT by token("\\+\\+")
+        val POW by token("\\*\\*")
         val OR by token("or")
         val AND by token("and\\b")
         val EQU by token("==")
@@ -70,8 +73,11 @@ fun main(args: Array<String>) {
         val id by token("\\w+")
 
         val ws by token("\\s+",ignore = true)
+
         //LEXER OVER
 
+        val preOpSymbols = NOT or PLUS or MINUS
+        val inOpSymbols = PLUS or MINUS or TIMES or DIV or CONCAT or AND or OR or EQU or LT or GT or LEQ or GEQ or NEQ
 
         val idParser = id use { text }
 
@@ -89,8 +95,52 @@ fun main(args: Array<String>) {
         }
         val varParser = idParser map {Var(it)}
 
+        //switch out preexper thing with parser(this::expr) later, if it works with preexpr
+        val preexpr: Parser<Expr> = literalParser or funCallParser or varParser
 
-        val expr: Parser<Expr> = literalParser or funCallParser or varParser
+        //operators zone
+        //TODO make this not seizure material
+
+        //make the levels general. maybe need to pull request/add something
+        val lvThirteenOperatorChain : Parser<Expr> = leftAssociative(preexpr, POW) { l,o,r ->
+            // use o for generalization
+            Infix(InOp.power,l,r)
+        }
+
+        val lvTwelveOperatorChain : Parser<Expr> = (PLUS or MINUS) * lvThirteenOperatorChain map {
+            (a,b)-> Prefix(if(a.type == PLUS) PreOp.plus else PreOp.negate, b)
+        }
+
+        val lvElevenOperatorChain : Parser<Expr> = leftAssociative(lvTwelveOperatorChain, (DIV or TIMES)) { l,o,r ->
+            Infix(if(o.type == DIV) InOp.div else InOp.times,l,r)
+        }
+
+        val lvTenOperatorChain : Parser<Expr> = leftAssociative(lvElevenOperatorChain, (PLUS or MINUS)) { l,o,r ->
+            Infix(if(o.type == PLUS) InOp.plus else InOp.negate,l,r)
+        }
+
+        val lvNineOperatorSymbols = EQU or NEQ or LEQ or GEQ or LT or GT
+        private val tokenToOperator = mapOf(
+                EQU to InOp.eqInt, NEQ to InOp.neq, LEQ to InOp.leq, GEQ to InOp.geq, LT to InOp.lt, GT to InOp.gt
+        )
+        val lvNineOperatorChain : Parser<Expr> = leftAssociative(lvTenOperatorChain, lvNineOperatorSymbols) { l,o,r ->
+            Infix(tokenToOperator[o.type]!!,l,r)
+        }
+
+        val lvSixOperatorChain : Parser<Expr> = NOT * lvNineOperatorChain map {
+            (a,b)-> Prefix(PreOp.not, b)
+        }
+
+        val lvFiveOperatorChain : Parser<Expr> = leftAssociative(lvSixOperatorChain, AND) { l, _, r ->
+            Infix(InOp.and,l,r);
+        }
+
+        val lvFourOperatorChain : Parser<Expr> = leftAssociative(lvFiveOperatorChain, OR) { l, _, r ->
+            Infix(InOp.or,l,r);
+        }
+
+        val expr = lvFourOperatorChain
+        //end operators zone
 
         val annotatedVarParser = idParser and -COLON and typeParser map {
             (a,b) -> AnnotatedVar(a,b)
@@ -130,4 +180,6 @@ fun main(args: Array<String>) {
     TommyParser().parseToEnd(exampleScript.inputStream()).forEach {println(it)}
 
 }
-//TODO do all of the above todos, then do in/preops, then do control flow
+//TODO elseif, all the dangling operators (from python reference, array access, etc)
+//TODO: fix exception, test operators at all, makes ure leftAssociative falls through like I think it does ...
+// (look through example, make test case)
