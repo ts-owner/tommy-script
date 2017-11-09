@@ -1,4 +1,5 @@
 package interpreter
+
 import com.github.h0tk3y.betterParse.combinators.*
 import com.github.h0tk3y.betterParse.grammar.Grammar
 import com.github.h0tk3y.betterParse.grammar.parseToEnd
@@ -72,7 +73,7 @@ fun main(args: Array<String>) {
 
         val id by token("\\w+")
 
-        val ws by token("\\s+",ignore = true)
+        val ws by token("\\s+", ignore = true)
 
         //LEXER OVER
 
@@ -85,15 +86,15 @@ fun main(args: Array<String>) {
             dirtyConverter[text]!!
         }
 
-        val stringParser = STRING use { LString(text.substring(1,text.length-1))}
+        val stringParser = STRING use { LString(text.substring(1, text.length - 1)) }
         val numParser = NUM use { LInt(text.toInt()) }
         val trueParser = TRUE use { LBool(true) }
         val falseParser = FALSE use { LBool(false) }
         val literalParser = stringParser or numParser or trueParser or falseParser
-        val funCallParser = id and -LPAR and separatedTerms(parser(this::expr),COMMA,acceptZero = true) and -RPAR map {
-            (name, args) -> FunCall(name.text,args)
+        val funCallParser = id and -LPAR and separatedTerms(parser(this::expr), COMMA, acceptZero = true) and -RPAR map { (name, args) ->
+            FunCall(name.text, args)
         }
-        val varParser = idParser map {Var(it)}
+        val varParser = idParser map { Var(it) }
 
         //switch out preexper thing with parser(this::expr) later, if it works with preexpr
         val preexpr: Parser<Expr> = literalParser or funCallParser or varParser
@@ -102,82 +103,83 @@ fun main(args: Array<String>) {
         //TODO make this not seizure material
 
         //make the levels general. maybe need to pull request/add something
-        val lvThirteenOperatorChain : Parser<Expr> = leftAssociative(preexpr, POW) { l,o,r ->
+        val lvThirteenOperatorChain: Parser<Expr> = leftAssociative(preexpr, POW) { l, o, r ->
             // use o for generalization
-            Infix(InOp.power,l,r)
+            Infix(InOp.power, l, r)
         }
 
-        val lvTwelveOperatorChain : Parser<Expr> = (PLUS or MINUS) * lvThirteenOperatorChain map {
-            (a,b)-> Prefix(if(a.type == PLUS) PreOp.plus else PreOp.negate, b)
+        val lvTwelveOperatorChain: Parser<Expr> = (PLUS or MINUS) * lvThirteenOperatorChain map { (a, b) ->
+            Prefix(if (a.type == PLUS) PreOp.plus else PreOp.negate, b)
         }
 
-        val lvElevenOperatorChain : Parser<Expr> = leftAssociative(lvTwelveOperatorChain, (DIV or TIMES)) { l,o,r ->
-            Infix(if(o.type == DIV) InOp.div else InOp.times,l,r)
+        val lvElevenOperatorChain: Parser<Expr> = leftAssociative(lvTwelveOperatorChain, (DIV or TIMES)) { l, o, r ->
+            Infix(if (o.type == DIV) InOp.div else InOp.times, l, r)
         }
 
-        val lvTenOperatorChain : Parser<Expr> = leftAssociative(lvElevenOperatorChain, (PLUS or MINUS)) { l,o,r ->
-            Infix(if(o.type == PLUS) InOp.plus else InOp.negate,l,r)
+        val lvTenOperatorChain: Parser<Expr> = leftAssociative(lvElevenOperatorChain, (PLUS or MINUS)) { l, o, r ->
+            Infix(if (o.type == PLUS) InOp.plus else InOp.negate, l, r)
         }
 
         val lvNineOperatorSymbols = EQU or NEQ or LEQ or GEQ or LT or GT
         private val tokenToOperator = mapOf(
                 EQU to InOp.eqInt, NEQ to InOp.neq, LEQ to InOp.leq, GEQ to InOp.geq, LT to InOp.lt, GT to InOp.gt
         )
-        val lvNineOperatorChain : Parser<Expr> = leftAssociative(lvTenOperatorChain, lvNineOperatorSymbols) { l,o,r ->
-            Infix(tokenToOperator[o.type]!!,l,r)
+        val lvNineOperatorChain: Parser<Expr> = leftAssociative(lvTenOperatorChain, lvNineOperatorSymbols) { l, o, r ->
+            Infix(tokenToOperator[o.type]!!, l, r)
         }
 
-        val lvSixOperatorChain : Parser<Expr> = NOT * lvNineOperatorChain map {
-            (a,b)-> Prefix(PreOp.not, b)
+        val lvSixOperatorChain: Parser<Expr> = NOT * lvNineOperatorChain map { (a, b) ->
+            Prefix(PreOp.not, b)
         }
 
-        val lvFiveOperatorChain : Parser<Expr> = leftAssociative(lvSixOperatorChain, AND) { l, _, r ->
-            Infix(InOp.and,l,r);
+        val lvFiveOperatorChain: Parser<Expr> = leftAssociative(lvSixOperatorChain, AND) { l, _, r ->
+            Infix(InOp.and, l, r);
         }
 
-        val lvFourOperatorChain : Parser<Expr> = leftAssociative(lvFiveOperatorChain, OR) { l, _, r ->
-            Infix(InOp.or,l,r);
+        val lvFourOperatorChain: Parser<Expr> = leftAssociative(lvFiveOperatorChain, OR) { l, _, r ->
+            Infix(InOp.or, l, r);
         }
 
         val expr = lvFourOperatorChain
         //end operators zone
 
-        val annotatedVarParser = idParser and -COLON and typeParser map {
-            (a,b) -> AnnotatedVar(a,b)
+        val annotatedVarParser = idParser and -COLON and typeParser map { (a, b) ->
+            AnnotatedVar(a, b)
         }
 
-        val varDefParser = -LET and annotatedVarParser and -EQUALS and expr map {
-            (a,b) -> VarDef(a,b)
+        val varDefParser = -LET and annotatedVarParser and -EQUALS and expr map { (a, b) ->
+            VarDef(a, b)
         }
 
-        val untypedVarDefParser = -(LET) and varParser and -EQUALS and expr map {
-            (a,b) -> UntypedVarDef(a,b)
+        val untypedVarDefParser = -(LET) and varParser and -EQUALS and expr map { (a, b) ->
+            UntypedVarDef(a, b)
         }
 
-        val varReassignParser = varParser and -EQUALS and expr map {
-            (a,b) -> VarReassign(a,b)
+        val varReassignParser = varParser and -EQUALS and expr map { (a, b) ->
+            VarReassign(a, b)
         }
 
-        val funDefParser = -LET * idParser *-LPAR * separatedTerms(annotatedVarParser, COMMA, acceptZero = true) * -RPAR * -COLON * typeParser * -EQUALS * zeroOrMore(parser(this::astParser))* -END map {
-            (funname, args, rettype, children) -> FunDef(funname, args, rettype, children)
+        val funDefParser = -LET * idParser * -LPAR * separatedTerms(annotatedVarParser, COMMA, acceptZero = true) * -RPAR * -COLON * typeParser * -EQUALS * zeroOrMore(parser(this::astParser)) * -END map { (funname, args, rettype, children) ->
+            FunDef(funname, args, rettype, children)
         }
 
-        val returnParser = -RETURN and expr map {
-            a -> Return(a)
+        val returnParser = -RETURN and expr map { a ->
+            Return(a)
         }
 
-        val ifParser = -IF and expr and -THEN and zeroOrMore(parser(this::astParser)) and optional(-ELSE and zeroOrMore(parser(this::astParser))) and -END map {
-            (cond,body, elsebody)-> If(cond,body,elsebody)
+        val ifParser = -IF and expr and -THEN and zeroOrMore(parser(this::astParser)) and optional(-ELSE and zeroOrMore(parser(this::astParser))) and -END map { (cond, body, elsebody) ->
+            If(cond, body, elsebody)
         }
         //TODO if, fundef, return
-        val statement : Parser<Statement> = returnParser or varDefParser or untypedVarDefParser or funDefParser or varReassignParser or ifParser
-        val astParser : Parser<AST> = statement or expr //order matters here for assignment!
+        val statement: Parser<Statement> = returnParser or varDefParser or untypedVarDefParser or funDefParser or varReassignParser or ifParser
+        val astParser: Parser<AST> = statement or expr //order matters here for assignment!
         override val rootParser: Parser<List<AST>> = oneOrMore(astParser) //TODO make this correct
-             //To change initializer of created properties use File | Settings | File Templates.
+        //To change initializer of created properties use File | Settings | File Templates.
     }
+
     var result = TommyParser().tryParseToEnd(exampleScript.inputStream())
     result.toString()
-    TommyParser().parseToEnd(exampleScript.inputStream()).forEach {println(it)}
+    TommyParser().parseToEnd(exampleScript.inputStream()).forEach { println(it) }
 
 }
 //TODO elseif, all the dangling operators (from python reference, array access, etc)
