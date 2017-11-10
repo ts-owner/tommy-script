@@ -18,7 +18,7 @@ fun main(args: Array<String>) {
 
     //TODO remove hardcoded filename
     //interpreter/testscript is a more complete example
-    var exampleScript = File("interpreter/easy.tom")
+    var exampleScript = File("interpreter/testscript.tom")
     var lines = exampleScript.readLines()
     println(lines)
 
@@ -39,9 +39,9 @@ fun main(args: Array<String>) {
         val MINUS by token("\\-")
         val DIV by token("/")
         val MOD by token("%")
+        val POW by token("\\*\\*")
         val TIMES by token("\\*")
         val CONCAT by token("\\+\\+")
-        val POW by token("\\*\\*")
         val OR by token("or")
         val AND by token("and\\b")
         val EQU by token("==")
@@ -97,7 +97,7 @@ fun main(args: Array<String>) {
         val varParser = idParser map { Var(it) }
 
         //switch out preexper thing with parser(this::expr) later, if it works with preexpr
-        val preexpr: Parser<Expr> = literalParser or funCallParser or varParser
+        val preexpr: Parser<Expr> = literalParser or funCallParser or varParser or (-LPAR * parser(this::expr) * -RPAR)
 
         //operators zone
         //TODO make this not seizure material
@@ -112,7 +112,8 @@ fun main(args: Array<String>) {
             Prefix(if (a.type == PLUS) PreOp.plus else PreOp.negate, b)
         }
 
-        val lvElevenOperatorChain: Parser<Expr> = leftAssociative(lvTwelveOperatorChain, (DIV or TIMES)) { l, o, r ->
+                                                                    //give alternative path around prefix operator
+        val lvElevenOperatorChain: Parser<Expr> = leftAssociative(lvTwelveOperatorChain or lvThirteenOperatorChain, (DIV or TIMES)) { l, o, r ->
             Infix(if (o.type == DIV) InOp.div else InOp.times, l, r)
         }
 
@@ -131,14 +132,15 @@ fun main(args: Array<String>) {
         val lvSixOperatorChain: Parser<Expr> = NOT * lvNineOperatorChain map { (a, b) ->
             Prefix(PreOp.not, b)
         }
-
-        val lvFiveOperatorChain: Parser<Expr> = leftAssociative(lvSixOperatorChain, AND) { l, _, r ->
+                                                                //give alternative path around prefix operator
+        val lvFiveOperatorChain: Parser<Expr> = leftAssociative(lvSixOperatorChain or lvNineOperatorChain, AND) { l, _, r ->
             Infix(InOp.and, l, r);
         }
 
         val lvFourOperatorChain: Parser<Expr> = leftAssociative(lvFiveOperatorChain, OR) { l, _, r ->
             Infix(InOp.or, l, r);
         }
+
 
         val expr = lvFourOperatorChain
         //end operators zone
