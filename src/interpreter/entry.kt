@@ -32,6 +32,12 @@ fun main(args: Array<String>) {
         //Symbols
         val LPAR by token("\\(")
         val RPAR by token("\\)")
+        val EQU by token("==")
+        val NEQ by token("!=")
+        val LEQ by token("<=")
+        val GEQ by token(">=")
+        val LT by token("<")
+        val GT by token(">")
         val COLON by token(":")
         val LET by token("let\\b")
         val EQUALS by token("=")
@@ -44,16 +50,10 @@ fun main(args: Array<String>) {
         val CONCAT by token("\\+\\+")
         val OR by token("or")
         val AND by token("and\\b")
-        val EQU by token("==")
-        val NEQ by token("!=")
-        val LEQ by token("<=")
-        val GEQ by token(">=")
-        val LT by token("<")
-        val GT by token(">")
         val COMMA by token(",")
 
         //keywords
-        val NOT by token("not\\b")
+        val NOT by token("not\\b") //@Brendan maybe not should require a space after/before it?
         val RETURN by token("return\\b")
         val END by token("end\\b")
         val IF by token("if\\b")

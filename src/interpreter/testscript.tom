@@ -7,11 +7,11 @@ let x = 3
 let y: Int = 13
 y=4
 x="asdasd"
-
+4==3
+if not (3==4) then
+    return a**2
+end
 let multiply(a: Int, b: Int):Int =
-    if a==b then
-        return a**2
-    end
     return (a * b)
 end
 print(multiply(1, 6 + 9))
