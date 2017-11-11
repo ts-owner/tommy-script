@@ -1,4 +1,4 @@
-package interpreter
+package core
 
 class TypeCheckingException(msg : String = "", cause : Exception? = null, val wrongExpr : Expr)
     : RuntimeException(msg, cause) {

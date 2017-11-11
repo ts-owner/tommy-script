@@ -1,9 +1,11 @@
 package interpreter
 
 import com.github.h0tk3y.betterParse.grammar.parseToEnd
+import core.parser.TommyParser
 import java.io.File
 import kotlin.test.assertEquals
 import kotlin.test.assertFails
+import core.*
 
 fun main(args: Array<String>) {
     //test the AST

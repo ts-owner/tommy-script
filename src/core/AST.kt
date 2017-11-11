@@ -1,4 +1,4 @@
-package interpreter
+package core
 
 sealed class Type
 
@@ -9,7 +9,6 @@ object TUnit : Type() { override fun toString() = "Unit" }
 data class TFunction(val dom : List<Type>, val cod : Type) : Type() {
      override fun toString() = "(${dom.joinToString()}) → $cod"
 }
-
 
 fun opType(n : Int, ty : Type) = TFunction(List(n, { ty }), ty)
 fun relationOn(n : Int, ty : Type) = TFunction(List(n, { ty }), TBool)
