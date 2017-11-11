@@ -61,20 +61,27 @@ class TommyParser : Grammar<List<AST>>() {
 
     private val idParser = id use { text }
 
+    //Parses a string to a TString or an int to a TInt or a boolean to a TBool
     private val typeParser = stringSymbol.asJust(TString) or
                              intSymbol.asJust(TInt) or
                              boolSymbol.asJust(TBool)
 
+    //Parses things like escape characters
     private val stringParser = STRING.map { match -> StringParser().tryParseToEnd(match.text) }
                                      .join().map(::LString)
 
-    private val numParser = NUM use { LInt(text.toInt()) }
-    private val trueParser = TRUE.asJust(LBool(true))
-    private val falseParser = FALSE.asJust(LBool(false))
-    private val literalParser = stringParser or numParser or trueParser or falseParser
+    private val numParser = NUM use { LInt(text.toInt()) } //Parses numbers into LInts
+    private val trueParser = TRUE.asJust(LBool(true)) //Parses "true" into a boolean (LBool) `true`
+    private val falseParser = FALSE.asJust(LBool(false)) //Parses "false" into a boolean (LBool) `false`
+    private val literalParser = stringParser or numParser or trueParser or falseParser //Parses the four literals (strings, numbers, booleans (true/false))
+
+    //Any amount of non-white-space followed by a ( and any number of parameters (`acceptZero = true` means it can be no parameters) and a )
+    //Maps the parameters (`args`) and function name (`name.text`) to a function call
     private val funCallParser = id and -LPAR and
                                 separatedTerms(parser(this::expr), COMMA, acceptZero = true) and
                                 -RPAR map { (name, args) -> FunCall(name.text, args) }
+
+    //Maps any non-white-space to a variable
     private val varParser = idParser.map(::Var)
 
     //switch out preexper thing with parser(this::expr) later, if it works with preexpr
@@ -82,67 +89,100 @@ class TommyParser : Grammar<List<AST>>() {
                           (-LPAR and parser(this::expr) and -RPAR)
 
     //operators zone
+    //The operators with the highest number in the operator chain happen first. Eg: power function > plus/minus
     //TODO make this not seizure material
 
     //make the levels general. maybe need to pull request/add something
+    //POWER FUNCTION (**)
     val lvThirteenOperatorChain: Parser<Expr> = leftAssociative(preexpr, POW) { l, o, r ->
         // use o for generalization
         Infix(InOp.power, l, r)
     }
 
+    //PLUS AND MINUS INVERT EACH OTHER
     val lvTwelveOperatorChain: Parser<Expr> = (PLUS or MINUS) * lvThirteenOperatorChain map { (a, b) ->
         Prefix(if (a.type == PLUS) PreOp.plus else PreOp.negate, b)
     }
 
     //give alternative path around prefix operator
+    //MULTIPLICATION AND DIVISION (* and /)
     val lvElevenOperatorChain: Parser<Expr> = leftAssociative(lvTwelveOperatorChain or lvThirteenOperatorChain, (DIV or TIMES)) { l, o, r ->
         Infix(if (o.type == DIV) InOp.div else InOp.times, l, r)
     }
 
+    //PLUS AND MINUS (+ and -)
     val lvTenOperatorChain: Parser<Expr> = leftAssociative(lvElevenOperatorChain, (PLUS or MINUS)) { l, o, r ->
         Infix(if (o.type == PLUS) InOp.plus else InOp.negate, l, r)
     }
 
+    //Defining characters as their actual functions (the characters being == and != and <= and >= and < and > )
     val lvNineOperatorSymbols = EQU or NEQ or LEQ or GEQ or LT or GT
     private val tokenToOperator = mapOf(
             EQU to InOp.eqInt, NEQ to InOp.neq, LEQ to InOp.leq, GEQ to InOp.geq, LT to InOp.lt, GT to InOp.gt
     )
+    //COMPARER TOKENS ( == and != and <= and >= and < and > )
     val lvNineOperatorChain: Parser<Expr> = leftAssociative(lvTenOperatorChain, lvNineOperatorSymbols) { l, o, r ->
         Infix(tokenToOperator[o.type]!!, l, r)
     }
 
+    //NOT
     val lvSixOperatorChain: Parser<Expr> = NOT * lvNineOperatorChain map { (a, b) ->
         Prefix(PreOp.not, b)
     }
     //give alternative path around prefix operator
+    //AND
     val lvFiveOperatorChain: Parser<Expr> = leftAssociative(lvSixOperatorChain or lvNineOperatorChain, AND) { l, _, r ->
         Infix(InOp.and, l, r);
     }
 
+    //OR
     val lvFourOperatorChain: Parser<Expr> = leftAssociative(lvFiveOperatorChain, OR) { l, _, r ->
         Infix(InOp.or, l, r);
     }
 
 
+    //The chain works by calling lvFourOperatorChain, which in turn calls lvFiveOperatorChain and then does its thing.
+    // But lvFiveOperatorChain calls lvSixOperatorChain, etc.
     private val expr = lvFourOperatorChain
     //end operators zone
 
+    //Types a variable
+    //x: String
+    //x: Bool
+    //x: Int
     private val annotatedVarParser = idParser and -COLON and typeParser map { (a, b) ->
         AnnotatedVar(a, b)
     }
 
+    //Creates a variable with a type
+    //let x: String = "test"
+    //let x: Boolean = true
+    //let x: Int = 3
     private val varDefParser = -LET and annotatedVarParser and -EQUALS and expr map { (a, b) ->
         VarDef(a, b)
     }
 
+    //Creates a new variable without a type
+    //let x = "test"
+    //let x = false
+    //let x = 3
     private val untypedVarDefParser = -LET and varParser and -EQUALS and expr map { (a, b) ->
         UntypedVarDef(a, b)
     }
 
+    //Reassigns a variable to a new value
+    //x = "test2"
     private val varReassignParser = varParser and -EQUALS and expr map { (a, b) ->
         VarReassign(a, b)
     }
 
+    //Declares a function
+    //let multiply (a: Int, b: Int):Int =
+        //return (a * b)
+        //end
+    //let printWord (a: String):Unit =
+        //print (a)
+        //end
     private val funDefParser = -LET and idParser and
             -LPAR and separatedTerms(annotatedVarParser, COMMA, acceptZero = true) and -RPAR and
             -COLON and typeParser and -EQUALS and
@@ -151,13 +191,26 @@ class TommyParser : Grammar<List<AST>>() {
         FunDef(funName, args, retType, children)
     }
 
+    //Returns something
+    //return (a * b)
     private val returnParser = -RETURN and expr.map(::Return)
 
+    //An if (and optional else)
+    //if (a == 3) then
+        //return "yes"
+    //else
+        //return "no"
+    //end
     private val ifParser = -IF and expr and -THEN and zeroOrMore(parser(this::astParser)) and
             optional(-ELSE and zeroOrMore(parser(this::astParser))) and
             -END map { (cond, body, elsebody) -> If(cond, body, elsebody) }
 
+    //A statement is either return or a typed variable declaration or an untyped variable declaration or a function or reassigning a variable or an if
+    //return (a * b)
     private val statement : Parser<Statement> = returnParser or varDefParser or untypedVarDefParser or funDefParser or varReassignParser or ifParser
+
+    //An ast is an expression or a statement
     private val astParser = statement or expr //order matters here for assignment!
+    //The root of the program is one or more asts (one or more expressions/statements)
     override val rootParser = oneOrMore(astParser) //TODO make this correct
 }
