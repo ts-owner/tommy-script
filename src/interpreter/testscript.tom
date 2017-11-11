@@ -1,7 +1,7 @@
 let x: String = "test"
 let y: String = 13
 let x = "asdasd"
-let x: String = "flipster"
+let x: String = "flips\ter"
 "asdasd"
 let x = 3
 let y: Int = 13
