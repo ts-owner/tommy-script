@@ -1546,7 +1546,7 @@ futureposition0 = 0
 end
 
 
-print(i)
+print(x)
 position0=futureposition0
 position1=futureposition1
 position2=futureposition2

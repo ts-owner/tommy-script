@@ -39,7 +39,15 @@ fun runbody(body: List<AST>, environment: MutableMap<String, Tuple2<String?, Any
             }
             is Expression -> {
                when(curr) {
-                   is Var -> return environment[curr.id]!!.t2
+                   is Var -> {
+                       val ret = environment[curr.id]?.t2
+                       if (ret != null) {
+                           return ret
+                       } else {
+                           nameError("variable not found ${curr.id} ${curr}")
+                       }
+
+                   }
                    is ArrayAccess -> {
                        //TODO clean up this, remove casts
                        var item = environment[curr.name.id]!!.t2

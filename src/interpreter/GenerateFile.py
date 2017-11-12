@@ -85,7 +85,7 @@ while output >= 0:
 i = 0
 output = 0
 
-file.write("\nprint(i)\n")
+file.write("\nprint(x)\n")
 
 while i < 81:
 	file.write(stringPhrase+str(i)+"="+"future"+stringPhrase+str(i)+"\n")
