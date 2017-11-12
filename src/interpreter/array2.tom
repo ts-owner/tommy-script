@@ -1,0 +1,8 @@
+let test = [true,3]
+test = test ++ 4
+let x = 0
+while (x<len(test)-1) do
+    x = x+1
+    print(test[x])
+end
+

@@ -165,7 +165,7 @@ class TommyParser : Grammar<List<AST>>() {
     }
 
     //CONCAT
-    val lvThreeOperatorChain: Parser<Expr> = rightAssociative(lvFourOperatorChain, CONCAT) { l, _, r ->
+    val lvThreeOperatorChain: Parser<Expr> = leftAssociative(lvFourOperatorChain, CONCAT) { l, _, r ->
         Infix(InOp.concat, l, r);
     }
 

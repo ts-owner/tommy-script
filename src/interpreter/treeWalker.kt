@@ -50,6 +50,8 @@ fun runbody(body: List<AST>, environment: MutableMap<String, Tuple2<String?, Any
                        //TODO put std lib in other file
                        //std lib
                        if(curr.id=="print") println(rec(curr.args.first(),environment))
+                       //the worst line of code ever written
+                       if(curr.id=="len") return (environment[(curr.args.first() as Var).id]!!.t2 as MutableList<*>).size
 
                        val storedData = environment[curr.id]
                        if (storedData != null) {
@@ -191,11 +193,18 @@ fun runbody(body: List<AST>, environment: MutableMap<String, Tuple2<String?, Any
                                }
                            }
                            is TString -> {
-                               val left = left.toString()
-                               val right = right.toString()
-                               when(curr.op) {
-                                   InOp.concat -> {
-                                       return left + right
+                               if (left is MutableList<*>) {
+                                   println("asdads")
+                                   left as MutableList<Any>
+                                   left.add(right)
+                                   return left
+                               } else {
+                                   val left = left.toString()
+                                   val right = right.toString()
+                                   when(curr.op) {
+                                       InOp.concat -> {
+                                           return left + right
+                                       }
                                    }
                                }
                            }
