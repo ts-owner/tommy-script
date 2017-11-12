@@ -6,6 +6,7 @@ import java.io.File
 import kotlin.test.assertEquals
 import kotlin.test.assertFails
 import core.*
+import java.io.FileNotFoundException
 
 fun main(args: Array<String>) {
     //test the AST
@@ -13,12 +14,23 @@ fun main(args: Array<String>) {
     assertEquals(TInt, typeInfer(mapOf("a" to TInt), testExpression))
     assertFails { typeInfer(mapOf("a" to TBool), testExpression) }
 
-    //read file from args
-    var exampleScript = File(args.first())
-    var lines = exampleScript.readLines()
+    var exampleScript:File?
+    var lines:List<String>?
 
-    //hardcode that second arg is debug
-    var debug = args.contains("debug")
+    //read file from args
+    try {
+        exampleScript = File(args.last())
+    } catch (e: NoSuchElementException) {
+        throw IllegalArgumentException("No path was given")
+    }
+
+    try {
+        lines = exampleScript.readLines()
+    } catch (e: FileNotFoundException) {
+        throw IllegalArgumentException("${args.first()}: No such file or directory")
+    }
+
+    var debug = args.contains("-d")
 
     if (debug) println(lines)
 

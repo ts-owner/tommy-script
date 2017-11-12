@@ -20,3 +20,9 @@ end
 print(multiply(100,50))
 print(multiply1(100,50,4))
 print(y)
+
+if ( 6 == 5) then
+    8
+else
+    9
+end
