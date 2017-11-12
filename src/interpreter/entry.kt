@@ -19,20 +19,18 @@ fun main(args: Array<String>) {
 
     //read file from args
     try {
-        exampleScript = File(args.first())
+        exampleScript = File(args.last())
     } catch (e: NoSuchElementException) {
-        throw IllegalArgumentException("no path was given")
+        throw IllegalArgumentException("No path was given")
     }
 
     try {
         lines = exampleScript.readLines()
     } catch (e: FileNotFoundException) {
-        throw IllegalArgumentException(args.first() + ": No such file or directory")
+        throw IllegalArgumentException("${args.first()}: No such file or directory")
     }
 
-
-    //hardcode that second arg is debug
-    var debug = args.contains("debug")
+    var debug = args.contains("-d")
 
     if (debug) println(lines)
 
