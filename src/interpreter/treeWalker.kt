@@ -15,17 +15,13 @@ fun runbody(body: List<AST>, environment: MutableMap<String, Tuple2<String?, Any
     //preserve hashmap for each one
     body.forEach {
         val ret = rec(it, environment)
-        //println("$ret --- ret")
         if (ret is ReturnBox) return ret.content
     }
-    //println(environment)
-    println("we returnin unit boys $body")
     return Unit
 }
 //TODO properly use typeError, handle double/int properly
 //
  fun rec(curr: AST, environment: MutableMap<String, Tuple2<String?, Any>>):Any {
-        println("$curr")
         fun typeError(expr: Expr, what: String) {
             throw TypeCheckingException(wrongExpr = expr, msg=what)
         }
@@ -53,7 +49,6 @@ fun runbody(body: List<AST>, environment: MutableMap<String, Tuple2<String?, Any
                            when (storedData.t2) {
                                is Tuple2<*,*> -> {
                                    //(args, statements)
-                                   //println(storedData)
                                    val storedTypeFunction=
                                            storedData as Tuple2<String?, Tuple2<List<AnnotatedVar>, Body>>
                                    val storedFunction = storedData.t2
@@ -116,7 +111,6 @@ fun runbody(body: List<AST>, environment: MutableMap<String, Tuple2<String?, Any
                    is Infix -> {
                        val left = rec(curr.lhs, environment)
                        val right = rec(curr.rhs, environment)
-                       //println("$left and $right, left and right, ${curr.op.type}")
                        //TODO make this less gross
                        when(curr.op.type.dom[0]) {
                            is TBool -> {
@@ -239,7 +233,6 @@ fun runbody(body: List<AST>, environment: MutableMap<String, Tuple2<String?, Any
                         environment[curr.id] = Tuple2(curr.returnType.toString() as String?, Tuple2(curr.args, curr.statements) as Any)
                     }
                     is Return -> {
-                        //println("return")
                         val ret =(rec(curr.toReturn,environment))
                         throw ReturnBoxHackException(returnValue = ret)
                     }
