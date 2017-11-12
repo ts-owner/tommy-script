@@ -136,10 +136,10 @@ fun runbody(body: List<AST>, environment: MutableMap<String, Tuple2<String?, Any
 
                                when(curr.op) {
                                    InOp.lt -> {
-                                       return right > left
+                                       return left < right
                                    }
                                    InOp.gt -> {
-                                       return left < right
+                                       return left > right
                                    }
                                    InOp.eqInt -> {
                                        return left == right

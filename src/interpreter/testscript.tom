@@ -1,13 +1,15 @@
-let x=3
-let fib(n: Int):Int =
-    if(n==1) then
-        return 1
-    elseif(n==0) then
-        return 1
-    else
-        let x = fib(n-1)
-        let y = fib(n-2)
-        return x+y
-    end
+let multiply(a: Int, b: Int):Int =
+    return (-a * b)
 end
-print(fib(10))
+
+let numOfRecursions = 0
+let fullValue = 0
+
+let Ack(m: Int, n: Int):Int =
+    if(m==0) then return n + 1
+    elseif(m>0 and n==0) then return Ack(m-1,1)
+    elseif(m>0 and n>0) then return Ack(m-1,Ack(m, n-1))
+    else print("not here pls") end
+end
+
+print(Ack(3,2))
