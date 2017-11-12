@@ -1,5 +1,5 @@
 things to do still
-	1.	loop grammar
+	1.	loop grammar - Finished
 	2.	fix the types thing (user defined types??)
 	3.	generalize the parser thing (too hard)
 	4.	add array operators

@@ -3,6 +3,7 @@
 
 #IDE files
 *.idea
+*.log
 .gradle
 build/
 *.iml

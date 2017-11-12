@@ -77,3 +77,4 @@ data class VarReassign(val lhs : Var, val rhs: Expr) : Statement()
 data class FunDef(val id : String, val args : List<AnnotatedVar>, val returnType : Type,
                   val statements : Body) : Statement()
 data class Return(val toReturn : Expr) : Statement()
+data class While(val cond : Expr, val statement : Body): Statement()
