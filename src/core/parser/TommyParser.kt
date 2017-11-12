@@ -39,6 +39,8 @@ class TommyParser : Grammar<List<AST>>() {
     private val THEN by token("then\\b")
     private val ELSE by token("else\\b")
     private val ELSEIF by token("elseif\\b")
+    private val WHILE by token("while\\b")
+    private val DO by token("\\bdo")
 
     //Literals
     private val NUM by token("\\d+")
@@ -88,6 +90,10 @@ class TommyParser : Grammar<List<AST>>() {
     //switch out preexper thing with parser(this::expr) later, if it works with preexpr
     private val preexpr = literalParser or funCallParser or varParser or
                           (-LPAR and parser(this::expr) and -RPAR)
+
+    private val whileParser = -WHILE and parser(this::expr) and
+                                           -DO and zeroOrMore(parser(this::statement)) and
+                                           -END map{(cond, statement) -> While(cond, statement)}
 
     //operators zone
     //The operators with the highest number in the operator chain happen first. Eg: power function > plus/minus
@@ -214,7 +220,7 @@ class TommyParser : Grammar<List<AST>>() {
 
     //A statement is either return or a typed variable declaration or an untyped variable declaration or a function or reassigning a variable or an if
     //return (a * b)
-    private val statement : Parser<Statement> = returnParser or varDefParser or untypedVarDefParser or funDefParser or varReassignParser or ifParser
+    private val statement : Parser<Statement> = returnParser or varDefParser or untypedVarDefParser or funDefParser or varReassignParser or ifParser or whileParser
 
     //An ast is an expression or a statement
     private val astParser = statement or expr //order matters here for assignment!
