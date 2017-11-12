@@ -15,4 +15,14 @@ let multiply1(a: Int, b: Int, c: Int):Int =
 end
 
 print(ackermannFunc(12,3,4))
-print(3>4 and true)
+
+
+let x = 0
+print(x<4)
+print(3<4)
+print(false and true)
+
+while x<=50 do
+    print(x)
+    x = x+1
+end
