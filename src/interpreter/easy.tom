@@ -2,5 +2,21 @@ let x = 3
 let y = 13
 y="asdas\td"
 x=(100/4+5/4)*3
-print(x)
+
+let multiply(a: Int, b: Int):Int =
+    return (a * b)
+end
+
+
+let multiply1(a: Int, b: Int, c: Int):Int =
+    return (a * b) - 100 + c
+end
+
+
+let multiply1(a: Int, b: Int, c: Int):Int =
+    return (a * b) - 100 + c
+end
+
+print(multiply(100,50))
+print(multiply1(100,50,4))
 print(y)

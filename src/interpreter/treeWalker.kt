@@ -1,6 +1,7 @@
 package interpreter
 
 import com.github.h0tk3y.betterParse.utils.Tuple2
+import com.sun.org.apache.xpath.internal.Arg
 import core.*
 import java.lang.Math.pow
 
@@ -10,18 +11,24 @@ fun walkTree(debug : Boolean, tree : List<AST>) {
     runbody(tree, HashMap())
 }
 
-fun runbody(body: List<AST>, environment: HashMap<String, Tuple2<String?, Any>>) {
+fun runbody(body: List<AST>, environment: HashMap<String, Tuple2<String?, Any>>):Any {
     //environment: variable name-> (type, value)
     //preserve hashmap for each one
-    body.forEach { rec(it, environment) }
+    body.forEach {
+        val ret = rec(it, environment)
+        if (ret is ReturnBox) return ret.content
+    }
     //println(environment)
-
+    return Unit
 }
 //TODO properly use typeError, handle double/int properly
 //
  fun rec(curr: AST, environment: HashMap<String, Tuple2<String?, Any>>):Any {
         fun typeError(expr: Expr, what: String) {
             throw TypeCheckingException(wrongExpr = expr, msg=what)
+        }
+        fun nameError(what: String) {
+            throw Exception(what) //TODO also when you try to define two of same function
         }
         when(curr) {
             is Literal -> {
@@ -35,8 +42,36 @@ fun runbody(body: List<AST>, environment: HashMap<String, Tuple2<String?, Any>>)
                when(curr) {
                    is Var -> return environment[curr.id]!!.t2
                    is FunCall -> {
-                       //TODO this
+                       //TODO put std lib in other file
+                       //std lib
                        if(curr.id=="print") println(rec(curr.args.first(),environment))
+
+                       val storedData = environment[curr.id]
+                       if (storedData != null) {
+                           when (storedData.t2) {
+                               is Tuple2<*,*> -> {
+                                   //(args, statements)
+                                   //println(storedData)
+                                   val storedTypeFunction=
+                                           storedData as Tuple2<String?, Tuple2<List<AnnotatedVar>, Body>>
+                                   val storedFunction = storedData.t2
+                                   //if (matchArgs(ffun.t1, curr.args))
+                                   if(storedFunction.t1.size == curr.args.size) {
+                                       //set arguments in environment
+                                       var new_environment = environment.toMap() as HashMap
+                                       //TODO not sure if ANYTHING from new environment persist ever
+                                       storedFunction.t1.zip(curr.args) { a : AnnotatedVar, b: Expr ->
+                                           new_environment[a.id] = Tuple2("placeholder" as String?, rec(b,environment))
+                                       }
+                                       // other function body, new environment including function args
+                                       val result = runbody(storedFunction.t2, new_environment)
+                                       return result
+                                   } else nameError("arg count mismatch")
+
+                               }
+                               else -> nameError("${curr.id} is not a function, but its a variable")
+                           }
+                       }
                    }
                    is Prefix -> {
                        when(curr.op.type.cod) {
@@ -124,7 +159,7 @@ fun runbody(body: List<AST>, environment: HashMap<String, Tuple2<String?, Any>>)
                                    InOp.div -> {
                                        return left/right
                                    }
-                                   InOp.power -> { //FLAGGED, MAYBE ASK ABOUT THIS
+                                   InOp.power -> { //TODO deal with double/int
                                        var power: Int = right
                                        var result = 1
 
@@ -192,9 +227,17 @@ fun runbody(body: List<AST>, environment: HashMap<String, Tuple2<String?, Any>>)
                         //TODO there needs to be some type checking here
                         environment[curr.lhs.id] = Tuple2("placeholder" as String?, res)
                     }
-                    //TODO fundef, return, while, funcall, functions at all, closures, runbody
+                    is FunDef -> {
+                        environment[curr.id] = Tuple2(curr.returnType.toString() as String?, Tuple2(curr.args, curr.statements) as Any)
+                    }
+                    is Return -> {
+                        return ReturnBox(rec(curr.toReturn,environment))
+                    }
+                    //TODO return, while, closures,
                 }
             }
         }
         return Unit
     }
+
+data class ReturnBox(val content: Any)
