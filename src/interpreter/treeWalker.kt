@@ -34,12 +34,18 @@ fun runbody(body: List<AST>, environment: MutableMap<String, Tuple2<String?, Any
                     is LInt -> return curr.value
                     is LString -> return curr.value
                     is LBool -> return curr.value
-                    is LArray ->  return curr.values
+                    is LArray ->  return curr.value.map{ rec(it,environment) }
                 }
             }
             is Expression -> {
                when(curr) {
                    is Var -> return environment[curr.id]!!.t2
+                   is ArrayAccess -> {
+                       //TODO clean up this, remove casts
+                       var item = environment[curr.name.id]!!.t2
+                       item = item as List<Literal>
+                       return item[rec(curr.index,environment) as Int]
+                   }
                    is FunCall -> {
                        //TODO put std lib in other file
                        //std lib
@@ -199,6 +205,13 @@ fun runbody(body: List<AST>, environment: MutableMap<String, Tuple2<String?, Any
             }
             is Statement -> {
                 when(curr) {
+                    is ArrayAssignment -> {
+                        var array = environment[curr.lhs.id]!!.t2 as MutableList<Any>
+
+                        array[rec(curr.index,environment) as Int] = rec(curr.rhs,environment)
+                        environment[curr.lhs.id] = Tuple2("placeholder" as String?, array as Any)
+
+                    }
                     is If -> {
                         //make sure it is boolean, maybe
                         val result = rec(curr.cond, environment)

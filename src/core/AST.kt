@@ -62,7 +62,7 @@ sealed class Literal(val ty : Type) : Expr()
 data class LInt(val value: Int) : Literal(TInt)
 data class LString(val value: String) : Literal(TString)
 data class LBool(val value: Boolean) : Literal(TBool)
-data class LArray(val values: List<Literal>): Literal(TArray)
+data class LArray(val value: MutableList<Literal>): Literal(TArray)
 object LUnit : Literal(TUnit) { override fun toString() = "unit" }
 
 sealed class Statement : AST()

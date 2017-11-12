@@ -79,10 +79,9 @@ class TommyParser : Grammar<List<AST>>() {
     private val trueParser = TRUE.asJust(LBool(true)) //Parses "true" into a boolean (LBool) `true`
     private val falseParser = FALSE.asJust(LBool(false)) //Parses "false" into a boolean (LBool) `false`
     //TODO make this expr eventually
-    private val arrayLiteralParser = -LBRA and separatedTerms(parser(this::preLiteral), COMMA, acceptZero = true) and -RBRA map { LArray(it) }
 
     private val preLiteral = stringParser or numParser or trueParser or falseParser
-    private val literalParser = preLiteral or arrayLiteralParser
+    private val literalParser = preLiteral
 
     //Any amount of non-white-space followed by a ( and any number of parameters (`acceptZero = true` means it can be no parameters) and a )
     //Maps the parameters (`args`) and function name (`name.text`) to a function call
@@ -93,12 +92,15 @@ class TommyParser : Grammar<List<AST>>() {
     //Maps any non-white-space to a variable
     private val varParser = idParser.map(::Var)
 
-    private val arrayGetParser :Parser<Expr> = varParser and -LBRA and parser(this::expr) and -RBRA and -COLON and parser(this::expr) map { (name, index) -> ArrayAccess(name, index) }
+    private val arrayLiteralParser = -LBRA and separatedTerms(parser(this::preLiteral), COMMA, acceptZero = true) and -RBRA map { LArray(it.toMutableList()) }
+
+    private val arrayGetParser :Parser<Expr> = varParser and -LBRA and parser(this::expr) and -RBRA map { (name, index) -> ArrayAccess(name, index) }
 
     //switch out preexper thing with parser(this::expr) later, if it works with preexpr
-    private val preexpr = literalParser or funCallParser or varParser or arrayGetParser or
+    private val preexpr = literalParser or funCallParser or arrayGetParser or varParser or arrayLiteralParser or
                           (-LPAR and parser(this::expr) and -RPAR)
 
+    //TODO move this somewhere else
     private val whileParser = -WHILE and parser(this::expr) and
                                            -DO and zeroOrMore(parser(this::astParser)) and
                                            -END map{(cond, statement) -> While(cond, statement)}

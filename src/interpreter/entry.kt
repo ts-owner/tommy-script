@@ -36,6 +36,7 @@ fun main(args: Array<String>) {
     if (debug) println(lines)
 
     var parseResult = TommyParser().parseToEnd(exampleScript.inputStream())
+
     walkTree(debug, parseResult)
 
 
