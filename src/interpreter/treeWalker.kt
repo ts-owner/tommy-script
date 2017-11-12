@@ -152,7 +152,6 @@ fun runbody(body: List<AST>, environment: MutableMap<String, Tuple2<String?, Any
                                    }
                                    InOp.mod -> {
                                        var result = left.rem(right)
-
                                       return result
                                    }
                                    InOp.times -> {

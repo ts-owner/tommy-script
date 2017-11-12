@@ -9,7 +9,7 @@ let Ack(m: Int, n: Int):Int =
     if(m==0) then return n + 1
     elseif(m>0 and n==0) then return Ack(m-1,1)
     elseif(m>0 and n>0) then return Ack(m-1,Ack(m, n-1))
-    else print("not here pls") end
+    end
 end
 
 print(Ack(3,2))
