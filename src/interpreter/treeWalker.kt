@@ -7,22 +7,25 @@ import java.lang.Math.pow
 
 fun walkTree(debug : Boolean, tree : List<AST>) {
     if(debug) println("starting tree walk interpreter")
-    runbody(tree, HashMap())
+    runbody(tree, mutableMapOf())
 }
 
-fun runbody(body: List<AST>, environment: HashMap<String, Tuple2<String?, Any>>):Any {
+fun runbody(body: List<AST>, environment: MutableMap<String, Tuple2<String?, Any>>):Any {
     //environment: variable name-> (type, value)
     //preserve hashmap for each one
     body.forEach {
         val ret = rec(it, environment)
+        //println("$ret --- ret")
         if (ret is ReturnBox) return ret.content
     }
     //println(environment)
+    println("we returnin unit boys $body")
     return Unit
 }
 //TODO properly use typeError, handle double/int properly
 //
- fun rec(curr: AST, environment: HashMap<String, Tuple2<String?, Any>>):Any {
+ fun rec(curr: AST, environment: MutableMap<String, Tuple2<String?, Any>>):Any {
+        println("$curr")
         fun typeError(expr: Expr, what: String) {
             throw TypeCheckingException(wrongExpr = expr, msg=what)
         }
@@ -57,14 +60,19 @@ fun runbody(body: List<AST>, environment: HashMap<String, Tuple2<String?, Any>>)
                                    //if (matchArgs(ffun.t1, curr.args))
                                    if(storedFunction.t1.size == curr.args.size) {
                                        //set arguments in environment
-                                       var new_environment = environment.toMap() as HashMap
+                                       var new_environment = environment.toMap() as MutableMap
                                        //TODO not sure if ANYTHING from new environment persist ever
                                        storedFunction.t1.zip(curr.args) { a : AnnotatedVar, b: Expr ->
-                                           new_environment[a.id] = Tuple2("placeholder" as String?, rec(b,environment))
+                                           val ret = rec(b,environment)
+                                           if (ret is ReturnBox) return ret.content
+                                           new_environment[a.id] = Tuple2("placeholder" as String?, ret)
                                        }
                                        // other function body, new environment including function args
-                                       val result = runbody(storedFunction.t2, new_environment)
-                                       return result
+                                       try {
+                                           val result = runbody(storedFunction.t2, new_environment)
+                                       } catch (e: ReturnBoxHackException) {
+                                           return e.returnValue
+                                       }
                                    } else nameError("arg count mismatch")
 
                                }
@@ -194,25 +202,22 @@ fun runbody(body: List<AST>, environment: HashMap<String, Tuple2<String?, Any>>)
                             var trueyet = false
                             if (result) {
                                 //TODO handle environment properly
-                                runbody(curr.thenBranch, environment)
-                                return Unit
+                                return runbody(curr.thenBranch, environment)
                             }
                             if (curr.elifs != null) {
                                 curr.elifs.forEach { (a, b) ->
                                     var res = rec(a, environment)
                                     if (res is Boolean) {
                                         if (res) {
-                                            runbody(b, environment)
-                                            return Unit
+                                            return runbody(b, environment)
                                         }
                                     } else typeError(a, "should be bool")
                                 }
-
-                                if (curr.elseBranch != null) {
-                                    runbody(curr.elseBranch, environment)
-                                }
-                            } else typeError(curr.cond, "should be bool")
-                        }
+                            }
+                            if (curr.elseBranch != null) {
+                                return runbody(curr.elseBranch, environment)
+                            }
+                        } else typeError(curr.cond, "should be bool")
                     }
                     is VarDef -> {
                         //TODO make it so you cant over-define things.
@@ -234,17 +239,27 @@ fun runbody(body: List<AST>, environment: HashMap<String, Tuple2<String?, Any>>)
                         environment[curr.id] = Tuple2(curr.returnType.toString() as String?, Tuple2(curr.args, curr.statements) as Any)
                     }
                     is Return -> {
-                        return ReturnBox(rec(curr.toReturn,environment))
+                        //println("return")
+                        val ret =(rec(curr.toReturn,environment))
+                        throw ReturnBoxHackException(returnValue = ret)
                     }
                     is While -> {
                         //TODO fix cast sloppiness
-                        while(rec(curr.cond,environment) as Boolean) runbody(curr.body, environment)
+                        while(rec(curr.cond,environment) as Boolean) {
+                            var ret = runbody(curr.body, environment)
+                            if (ret is ReturnBox) return ret.content
+                        }
                     }
                 //TODO while, closures
                 }
             }
         }
-    return Unit
+    return "nothing ${curr}"
 }
 
 data class ReturnBox(val content: Any)
+
+class ReturnBoxHackException(val returnValue: Any , cause : Exception? = null)
+    : RuntimeException("not error", cause) {
+    override fun toString() = super.toString()
+}

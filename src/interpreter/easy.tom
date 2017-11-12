@@ -6,6 +6,8 @@ let numOfRecursions = 0
 let fullValue = 0
 
 let ackermannFunc(a: Int, b: Int):Int =
+    print(a)
+    print(b)
     let calc = 0
     let calc2 = 0
 
