@@ -1,7 +1,7 @@
 package interpreter
 
+import com.github.h0tk3y.betterParse.utils.Tuple2
 import core.*
-
 import java.lang.Math.pow
 
 
@@ -14,6 +14,7 @@ fun runbody(body: List<AST>, environment: HashMap<String, Tuple2<String?, Any>>)
     //environment: variable name-> (type, value)
     //preserve hashmap for each one
     body.forEach { rec(it, environment) }
+    //println(environment)
 
 }
 //TODO properly use typeError, handle double/int properly
@@ -32,7 +33,11 @@ fun runbody(body: List<AST>, environment: HashMap<String, Tuple2<String?, Any>>)
             }
             is Expression -> {
                when(curr) {
-                   is Var -> return environment[curr.id]!!
+                   is Var -> return environment[curr.id]!!.t2
+                   is FunCall -> {
+                       //TODO this
+                       if(curr.id=="print") println(rec(curr.args.first(),environment))
+                   }
                    is Prefix -> {
                        when(curr.op.type.cod) {
                            is TBool -> {
@@ -44,7 +49,7 @@ fun runbody(body: List<AST>, environment: HashMap<String, Tuple2<String?, Any>>)
                                       if (exp is Boolean) {
                                           return  !exp
                                       } else {
-                                          //type error
+                                          typeError(curr.expr, "should be bool")
                                       }
                                   }
                               }
@@ -154,20 +159,20 @@ fun runbody(body: List<AST>, environment: HashMap<String, Tuple2<String?, Any>>)
                             var trueyet = false
                             if (result) {
                                 //TODO handle environment properly
-                                runbody(curr.thenBranch)
+                                runbody(curr.thenBranch,environment)
                             } else if (curr.elifs != null) {
                                 curr.elifs.forEach { (a,b) ->
                                     var res = rec(a,environment)
                                     if(res is Boolean) {
                                         if (res) {
-                                            runbody(b)
+                                            runbody(b,environment)
                                             trueyet = true
                                         }
                                     } else typeError(a, "should be bool")
                                 }
 
                             } else if (curr.elseBranch != null && !trueyet) {
-                                runbody(curr.elseBranch)
+                                runbody(curr.elseBranch,environment)
                             }
                         } else typeError(curr.cond, "should be bool")
                     }
@@ -191,4 +196,5 @@ fun runbody(body: List<AST>, environment: HashMap<String, Tuple2<String?, Any>>)
                 }
             }
         }
+        return Unit
     }
