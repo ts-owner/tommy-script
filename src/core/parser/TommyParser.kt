@@ -11,6 +11,8 @@ class TommyParser : Grammar<List<AST>>() {
     //Symbols
     private val LPAR by token("\\(")
     private val RPAR by token("\\)")
+    private val LBRA by token("\\[")
+    private val RBRA by token("\\]")
     private val EQU by token("==")
     private val NEQ by token("!=")
     private val LEQ by token("<=")
@@ -39,6 +41,8 @@ class TommyParser : Grammar<List<AST>>() {
     private val THEN by token("then\\b")
     private val ELSE by token("else\\b")
     private val ELSEIF by token("elseif\\b")
+    private val WHILE by token("while\\b")
+    private val DO by token("\\bdo")
 
     //Literals
     private val NUM by token("\\d+")
@@ -57,15 +61,15 @@ class TommyParser : Grammar<List<AST>>() {
 
     //LEXER OVER
 
-    private val preOpSymbols = NOT or PLUS or MINUS
-    private val inOpSymbols = PLUS or MINUS or TIMES or DIV or CONCAT or AND or OR or EQU or LT or GT or LEQ or GEQ or NEQ or MOD
-
     private val idParser = id use { text }
 
+    private val arrayTypeParser = -LBRA and parser(this::typeParser).map { TArray(it) } and -RBRA
+
     //Parses a string to a TString or an int to a TInt or a boolean to a TBool
-    private val typeParser = stringSymbol.asJust(TString) or
-                             intSymbol.asJust(TInt) or
-                             boolSymbol.asJust(TBool)
+    private val typeParser : Parser<Type> = stringSymbol.asJust(TString) or
+            intSymbol.asJust(TInt) or
+            boolSymbol.asJust(TBool) or
+            arrayTypeParser
 
     //Parses things like escape characters
     private val stringParser = STRING.map { match -> StringParser().tryParseToEnd(match.text) }
@@ -85,9 +89,17 @@ class TommyParser : Grammar<List<AST>>() {
     //Maps any non-white-space to a variable
     private val varParser = idParser.map(::Var)
 
+    private val arrayGetParser = id and -LBRA and parser(this::expr) and -RBRA and -COLON and parser(this::expr) map { (name, index) -> ArrayGet(name.text, index) }
+    private val arraySetParser = id and -LBRA and parser(this::expr) and -RBRA and -EQUALS and
+            parser(this::statement) map { (name, index, newObj) -> ArraySet(name.text, index, newObj)}
+
     //switch out preexper thing with parser(this::expr) later, if it works with preexpr
     private val preexpr = literalParser or funCallParser or varParser or
                           (-LPAR and parser(this::expr) and -RPAR)
+
+    private val whileParser = -WHILE and parser(this::expr) and
+                                           -DO and zeroOrMore(parser(this::statement)) and
+                                           -END map{(cond, statement) -> While(cond, statement)}
 
     //operators zone
     //The operators with the highest number in the operator chain happen first. Eg: power function > plus/minus
@@ -107,7 +119,7 @@ class TommyParser : Grammar<List<AST>>() {
 
     //MODULUS (%)
     var lvTwelveOperatorChain: Parser<Expr> = leftAssociative(lvThirteenOperatorChain or lvFourteenOperatorChain, MOD) { l, o, r ->
-        Infix(InOp.mod, l, r);
+        Infix(InOp.mod, l, r)
     }
 
     //give alternative path around prefix operator
@@ -214,9 +226,10 @@ class TommyParser : Grammar<List<AST>>() {
 
     //A statement is either return or a typed variable declaration or an untyped variable declaration or a function or reassigning a variable or an if
     //return (a * b)
-    private val statement : Parser<Statement> = returnParser or varDefParser or untypedVarDefParser or funDefParser or varReassignParser or ifParser
+    private val statement : Parser<Statement> = returnParser or varDefParser or untypedVarDefParser or funDefParser or
+            varReassignParser or ifParser or whileParser or arrayGetParser or arraySetParser
 
-    //An ast is an expression or a statement
+            //An ast is an expression or a statement
     private val astParser = statement or expr //order matters here for assignment!
     //The root of the program is one or more asts (one or more expressions/statements)
     override val rootParser = oneOrMore(astParser) //TODO make this correct

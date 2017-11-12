@@ -8,6 +8,14 @@ object TInt : Type() { override fun toString() = "Int" }
 object TString : Type() { override fun toString() = "String" }
 object TBool : Type() { override fun toString() = "Bool" }
 object TUnit : Type() { override fun toString() = "Unit" }
+data class TArray(val clazz : Type) : Type() {
+    override fun toString(): String {
+        return "[" + clazz.toString() + "]"
+    }
+    fun getClass(): Type {
+        return clazz
+    }
+}
 data class TFunction(val dom : List<Type>, val cod : Type) : Type() {
      override fun toString() = "(${dom.joinToString()}) → $cod"
 }
@@ -49,6 +57,9 @@ data class Prefix(val op : PreOp, val expr : Expr) : Expr()
 data class Infix(val op : InOp, val lhs : Expr, val rhs : Expr) : Expr()
 data class FunCall(val id : String, val args : List<Expr>) : Expr()
 
+data class ArrayGet(val name : String, val index : Expr) : Statement()
+data class ArraySet(val name : String, val index : Expr, val newObj : Statement) : Statement()
+
 // Literals
 sealed class Literal(val ty : Type) : Expr()
 
@@ -69,3 +80,4 @@ data class VarReassign(val lhs : Var, val rhs: Expr) : Statement()
 data class FunDef(val id : String, val args : List<AnnotatedVar>, val returnType : Type,
                   val statements : Body) : Statement()
 data class Return(val toReturn : Expr) : Statement()
+data class While(val cond : Expr, val statement : Body): Statement()
