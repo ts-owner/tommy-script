@@ -58,7 +58,6 @@ sealed class Statement : AST()
 //typealias Body = List<Statement> //TODO @Brendan should't this be List<AST> so you can have funcalls in body
 typealias Body = List<AST> //potentially temporary change to make parser work
 
-
 // Statements
 data class If(val cond : Expr, val thenBranch : Body, val elseBranch : Body? = null) : Statement() //empty if's are illegal, like python //TODO think about elseif/multiple else
 data class VarDef(val lhs : AnnotatedVar, val rhs : Expr) : Statement() //TODO annotations should be optional
