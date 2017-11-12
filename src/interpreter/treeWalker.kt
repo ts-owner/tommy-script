@@ -1,13 +1,27 @@
 package interpreter
 
+import com.github.h0tk3y.betterParse.utils.Tuple2
 import core.*
-import jdk.internal.org.objectweb.asm.tree.TypeInsnNode
-import kotlin.test.assertTrue
+
 
 
 fun walkTree(debug : Boolean, tree : List<AST>) {
     if(debug) println("starting tree walk interpreter")
-    fun rec(curr: AST, environment: Map<String, Any>):Any {
+    runbody(tree, HashMap())
+}
+
+fun runbody(body: List<AST>, environment: HashMap<String, Tuple2<String?, Any>>) {
+    //environment: variable name-> (type, value)
+    //preserve hashmap for each one
+    body.forEach { rec(it, environment) }
+
+}
+//TODO properly use typeError, handle double/int properly
+//
+ fun rec(curr: AST, environment: HashMap<String, Tuple2<String?, Any>>):Any {
+        fun typeError(expr: Expr, what: String) {
+            throw TypeCheckingException(wrongExpr = expr, msg=what)
+        }
         when(curr) {
             is Literal -> {
                 when(curr) {
@@ -89,13 +103,46 @@ fun walkTree(debug : Boolean, tree : List<AST>) {
                 when(curr) {
                     is If -> {
                         //make sure it is boolean, maybe
-                        //TODO after bools are implemented
-                        rec(curr.cond, environment)
-                    }
-                    is
+                        val result = rec(curr.cond, environment)
+                        if (result is Boolean) {
+                            var trueyet = false
+                            if (result) {
+                                //TODO handle environment properly
+                                runbody(curr.thenBranch)
+                            } else if (curr.elifs != null) {
+                                curr.elifs.forEach { (a,b) ->
+                                    var res = rec(a,environment)
+                                    if(res is Boolean) {
+                                        if (res) {
+                                            runbody(b)
+                                            trueyet = true
+                                        }
+                                    } else typeError(a, "should be bool")
+                                }
 
+                            } else if (curr.elseBranch != null && !trueyet) {
+                                runbody(curr.elseBranch)
+                            }
+                        } else typeError(curr.cond, "should be bool")
+                    }
+                    is VarDef -> {
+                        //TODO make it so you cant over-define things.
+                        val res = rec(curr.rhs, environment)
+                        environment[curr.lhs.id] = Tuple2("placeholder until we fix type parsing" as String?,res)
+                    }
+                    is UntypedVarDef -> {
+                        val res = rec(curr.rhs, environment)
+                        environment[curr.lhs.id] = Tuple2(null as String?, res)
+                    }
+                    is VarReassign -> {
+                        //maybe assert that res is a value?
+                        val res = rec(curr.rhs, environment)
+                        val existingvar = environment[curr.lhs.id]!!
+                        //TODO there needs to be some type checking here
+                        environment[curr.lhs.id] = Tuple2("placeholder" as String?, res)
+                    }
+                    //TODO fundef, return, while, funcall, functions at all, closures, runbody
                 }
             }
         }
     }
-}
