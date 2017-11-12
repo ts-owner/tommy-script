@@ -1,0 +1,1636 @@
+
+let x = 0
+let value = 0
+print(x)
+let position0 = 0
+let position1 = 0
+let position2 = 0
+let position3 = 0
+let position4 = 0
+let position5 = 0
+let position6 = 0
+let position7 = 0
+let position8 = 0
+let position9 = 0
+let position10 = 0
+let position11 = 0
+let position12 = 0
+let position13 = 0
+let position14 = 0
+let position15 = 0
+let position16 = 0
+let position17 = 0
+let position18 = 0
+let position19 = 0
+let position20 = 0
+let position21 = 0
+let position22 = 0
+let position23 = 0
+let position24 = 0
+let position25 = 0
+let position26 = 0
+let position27 = 0
+let position28 = 0
+let position29 = 0
+let position30 = 0
+let position31 = 0
+let position32 = 0
+let position33 = 0
+let position34 = 0
+let position35 = 0
+let position36 = 0
+let position37 = 0
+let position38 = 0
+let position39 = 0
+let position40 = 0
+let position41 = 0
+let position42 = 0
+let position43 = 0
+let position44 = 0
+let position45 = 0
+let position46 = 0
+let position47 = 0
+let position48 = 0
+let position49 = 0
+let position50 = 0
+let position51 = 0
+let position52 = 0
+let position53 = 0
+let position54 = 0
+let position55 = 0
+let position56 = 0
+let position57 = 0
+let position58 = 0
+let position59 = 0
+let position60 = 0
+let position61 = 0
+let position62 = 0
+let position63 = 0
+let position64 = 0
+let position65 = 0
+let position66 = 0
+let position67 = 0
+let position68 = 0
+let position69 = 0
+let position70 = 0
+let position71 = 0
+let position72 = 0
+let position73 = 0
+let position74 = 0
+let position75 = 0
+let position76 = 0
+let position77 = 0
+let position78 = 0
+let position79 = 0
+let position80 = 0
+
+print(x)
+let futureposition0 = 0
+let futureposition1 = 0
+let futureposition2 = 0
+let futureposition3 = 0
+let futureposition4 = 0
+let futureposition5 = 0
+let futureposition6 = 0
+let futureposition7 = 0
+let futureposition8 = 0
+let futureposition9 = 0
+let futureposition10 = 0
+let futureposition11 = 0
+let futureposition12 = 0
+let futureposition13 = 0
+let futureposition14 = 0
+let futureposition15 = 0
+let futureposition16 = 0
+let futureposition17 = 0
+let futureposition18 = 0
+let futureposition19 = 0
+let futureposition20 = 0
+let futureposition21 = 0
+let futureposition22 = 0
+let futureposition23 = 0
+let futureposition24 = 0
+let futureposition25 = 0
+let futureposition26 = 0
+let futureposition27 = 0
+let futureposition28 = 0
+let futureposition29 = 0
+let futureposition30 = 0
+let futureposition31 = 0
+let futureposition32 = 0
+let futureposition33 = 0
+let futureposition34 = 0
+let futureposition35 = 0
+let futureposition36 = 0
+let futureposition37 = 0
+let futureposition38 = 0
+let futureposition39 = 0
+let futureposition40 = 0
+let futureposition41 = 0
+let futureposition42 = 0
+let futureposition43 = 0
+let futureposition44 = 0
+let futureposition45 = 0
+let futureposition46 = 0
+let futureposition47 = 0
+let futureposition48 = 0
+let futureposition49 = 0
+let futureposition50 = 0
+let futureposition51 = 0
+let futureposition52 = 0
+let futureposition53 = 0
+let futureposition54 = 0
+let futureposition55 = 0
+let futureposition56 = 0
+let futureposition57 = 0
+let futureposition58 = 0
+let futureposition59 = 0
+let futureposition60 = 0
+let futureposition61 = 0
+let futureposition62 = 0
+let futureposition63 = 0
+let futureposition64 = 0
+let futureposition65 = 0
+let futureposition66 = 0
+let futureposition67 = 0
+let futureposition68 = 0
+let futureposition69 = 0
+let futureposition70 = 0
+let futureposition71 = 0
+let futureposition72 = 0
+let futureposition73 = 0
+let futureposition74 = 0
+let futureposition75 = 0
+let futureposition76 = 0
+let futureposition77 = 0
+let futureposition78 = 0
+let futureposition79 = 0
+let futureposition80 = 0
+
+while x < 10 do
+
+print(x)
+value =  position79 + position71 + position72 + position70 +0
+if value < 2 and value > 0 then
+futureposition80 = 0
+end
+
+value =  position79 + position71 + position72 + position70 +0
+if value < 4 and value > 1 then
+futureposition80 = 1
+end
+
+value =  position79 + position71 + position72 + position70 +0
+if value > 3 then
+futureposition80 = 0
+end
+
+
+print(x)
+value = position80 + position78 + position70 + position71 + position69 +0
+if value < 2 and value > 0 then
+futureposition79 = 0
+end
+
+value = position80 + position78 + position70 + position71 + position69 +0
+if value < 4 and value > 1 then
+futureposition79 = 1
+end
+
+value = position80 + position78 + position70 + position71 + position69 +0
+if value > 3 then
+futureposition79 = 0
+end
+
+
+print(x)
+value = position79 + position77 + position69 + position70 + position68 +0
+if value < 2 and value > 0 then
+futureposition78 = 0
+end
+
+value = position79 + position77 + position69 + position70 + position68 +0
+if value < 4 and value > 1 then
+futureposition78 = 1
+end
+
+value = position79 + position77 + position69 + position70 + position68 +0
+if value > 3 then
+futureposition78 = 0
+end
+
+
+print(x)
+value = position78 + position76 + position68 + position69 + position67 +0
+if value < 2 and value > 0 then
+futureposition77 = 0
+end
+
+value = position78 + position76 + position68 + position69 + position67 +0
+if value < 4 and value > 1 then
+futureposition77 = 1
+end
+
+value = position78 + position76 + position68 + position69 + position67 +0
+if value > 3 then
+futureposition77 = 0
+end
+
+
+print(x)
+value = position77 + position75 + position67 + position68 + position66 +0
+if value < 2 and value > 0 then
+futureposition76 = 0
+end
+
+value = position77 + position75 + position67 + position68 + position66 +0
+if value < 4 and value > 1 then
+futureposition76 = 1
+end
+
+value = position77 + position75 + position67 + position68 + position66 +0
+if value > 3 then
+futureposition76 = 0
+end
+
+
+print(x)
+value = position76 + position74 + position66 + position67 + position65 +0
+if value < 2 and value > 0 then
+futureposition75 = 0
+end
+
+value = position76 + position74 + position66 + position67 + position65 +0
+if value < 4 and value > 1 then
+futureposition75 = 1
+end
+
+value = position76 + position74 + position66 + position67 + position65 +0
+if value > 3 then
+futureposition75 = 0
+end
+
+
+print(x)
+value = position75 + position73 + position65 + position66 + position64 +0
+if value < 2 and value > 0 then
+futureposition74 = 0
+end
+
+value = position75 + position73 + position65 + position66 + position64 +0
+if value < 4 and value > 1 then
+futureposition74 = 1
+end
+
+value = position75 + position73 + position65 + position66 + position64 +0
+if value > 3 then
+futureposition74 = 0
+end
+
+
+print(x)
+value = position74 + position72 + position64 + position65 + position63 +0
+if value < 2 and value > 0 then
+futureposition73 = 0
+end
+
+value = position74 + position72 + position64 + position65 + position63 +0
+if value < 4 and value > 1 then
+futureposition73 = 1
+end
+
+value = position74 + position72 + position64 + position65 + position63 +0
+if value > 3 then
+futureposition73 = 0
+end
+
+
+print(x)
+value = position73 + position71 + position63 + position64 + position80 + position62 +0
+if value < 2 and value > 0 then
+futureposition72 = 0
+end
+
+value = position73 + position71 + position63 + position64 + position80 + position62 +0
+if value < 4 and value > 1 then
+futureposition72 = 1
+end
+
+value = position73 + position71 + position63 + position64 + position80 + position62 +0
+if value > 3 then
+futureposition72 = 0
+end
+
+
+print(x)
+value = position72 + position70 + position80 + position62 + position63 + position79 + position61 +0
+if value < 2 and value > 0 then
+futureposition71 = 0
+end
+
+value = position72 + position70 + position80 + position62 + position63 + position79 + position61 +0
+if value < 4 and value > 1 then
+futureposition71 = 1
+end
+
+value = position72 + position70 + position80 + position62 + position63 + position79 + position61 +0
+if value > 3 then
+futureposition71 = 0
+end
+
+
+print(x)
+value = position71 + position69 + position79 + position61 + position80 + position62 + position78 + position60 +0
+if value < 2 and value > 0 then
+futureposition70 = 0
+end
+
+value = position71 + position69 + position79 + position61 + position80 + position62 + position78 + position60 +0
+if value < 4 and value > 1 then
+futureposition70 = 1
+end
+
+value = position71 + position69 + position79 + position61 + position80 + position62 + position78 + position60 +0
+if value > 3 then
+futureposition70 = 0
+end
+
+
+print(x)
+value = position70 + position68 + position78 + position60 + position79 + position61 + position77 + position59 +0
+if value < 2 and value > 0 then
+futureposition69 = 0
+end
+
+value = position70 + position68 + position78 + position60 + position79 + position61 + position77 + position59 +0
+if value < 4 and value > 1 then
+futureposition69 = 1
+end
+
+value = position70 + position68 + position78 + position60 + position79 + position61 + position77 + position59 +0
+if value > 3 then
+futureposition69 = 0
+end
+
+
+print(x)
+value = position69 + position67 + position77 + position59 + position78 + position60 + position76 + position58 +0
+if value < 2 and value > 0 then
+futureposition68 = 0
+end
+
+value = position69 + position67 + position77 + position59 + position78 + position60 + position76 + position58 +0
+if value < 4 and value > 1 then
+futureposition68 = 1
+end
+
+value = position69 + position67 + position77 + position59 + position78 + position60 + position76 + position58 +0
+if value > 3 then
+futureposition68 = 0
+end
+
+
+print(x)
+value = position68 + position66 + position76 + position58 + position77 + position59 + position75 + position57 +0
+if value < 2 and value > 0 then
+futureposition67 = 0
+end
+
+value = position68 + position66 + position76 + position58 + position77 + position59 + position75 + position57 +0
+if value < 4 and value > 1 then
+futureposition67 = 1
+end
+
+value = position68 + position66 + position76 + position58 + position77 + position59 + position75 + position57 +0
+if value > 3 then
+futureposition67 = 0
+end
+
+
+print(x)
+value = position67 + position65 + position75 + position57 + position76 + position58 + position74 + position56 +0
+if value < 2 and value > 0 then
+futureposition66 = 0
+end
+
+value = position67 + position65 + position75 + position57 + position76 + position58 + position74 + position56 +0
+if value < 4 and value > 1 then
+futureposition66 = 1
+end
+
+value = position67 + position65 + position75 + position57 + position76 + position58 + position74 + position56 +0
+if value > 3 then
+futureposition66 = 0
+end
+
+
+print(x)
+value = position66 + position64 + position74 + position56 + position75 + position57 + position73 + position55 +0
+if value < 2 and value > 0 then
+futureposition65 = 0
+end
+
+value = position66 + position64 + position74 + position56 + position75 + position57 + position73 + position55 +0
+if value < 4 and value > 1 then
+futureposition65 = 1
+end
+
+value = position66 + position64 + position74 + position56 + position75 + position57 + position73 + position55 +0
+if value > 3 then
+futureposition65 = 0
+end
+
+
+print(x)
+value = position65 + position63 + position73 + position55 + position74 + position56 + position72 + position54 +0
+if value < 2 and value > 0 then
+futureposition64 = 0
+end
+
+value = position65 + position63 + position73 + position55 + position74 + position56 + position72 + position54 +0
+if value < 4 and value > 1 then
+futureposition64 = 1
+end
+
+value = position65 + position63 + position73 + position55 + position74 + position56 + position72 + position54 +0
+if value > 3 then
+futureposition64 = 0
+end
+
+
+print(x)
+value = position64 + position62 + position72 + position54 + position73 + position55 + position71 + position53 +0
+if value < 2 and value > 0 then
+futureposition63 = 0
+end
+
+value = position64 + position62 + position72 + position54 + position73 + position55 + position71 + position53 +0
+if value < 4 and value > 1 then
+futureposition63 = 1
+end
+
+value = position64 + position62 + position72 + position54 + position73 + position55 + position71 + position53 +0
+if value > 3 then
+futureposition63 = 0
+end
+
+
+print(x)
+value = position63 + position61 + position71 + position53 + position72 + position54 + position70 + position52 +0
+if value < 2 and value > 0 then
+futureposition62 = 0
+end
+
+value = position63 + position61 + position71 + position53 + position72 + position54 + position70 + position52 +0
+if value < 4 and value > 1 then
+futureposition62 = 1
+end
+
+value = position63 + position61 + position71 + position53 + position72 + position54 + position70 + position52 +0
+if value > 3 then
+futureposition62 = 0
+end
+
+
+print(x)
+value = position62 + position60 + position70 + position52 + position71 + position53 + position69 + position51 +0
+if value < 2 and value > 0 then
+futureposition61 = 0
+end
+
+value = position62 + position60 + position70 + position52 + position71 + position53 + position69 + position51 +0
+if value < 4 and value > 1 then
+futureposition61 = 1
+end
+
+value = position62 + position60 + position70 + position52 + position71 + position53 + position69 + position51 +0
+if value > 3 then
+futureposition61 = 0
+end
+
+
+print(x)
+value = position61 + position59 + position69 + position51 + position70 + position52 + position68 + position50 +0
+if value < 2 and value > 0 then
+futureposition60 = 0
+end
+
+value = position61 + position59 + position69 + position51 + position70 + position52 + position68 + position50 +0
+if value < 4 and value > 1 then
+futureposition60 = 1
+end
+
+value = position61 + position59 + position69 + position51 + position70 + position52 + position68 + position50 +0
+if value > 3 then
+futureposition60 = 0
+end
+
+
+print(x)
+value = position60 + position58 + position68 + position50 + position69 + position51 + position67 + position49 +0
+if value < 2 and value > 0 then
+futureposition59 = 0
+end
+
+value = position60 + position58 + position68 + position50 + position69 + position51 + position67 + position49 +0
+if value < 4 and value > 1 then
+futureposition59 = 1
+end
+
+value = position60 + position58 + position68 + position50 + position69 + position51 + position67 + position49 +0
+if value > 3 then
+futureposition59 = 0
+end
+
+
+print(x)
+value = position59 + position57 + position67 + position49 + position68 + position50 + position66 + position48 +0
+if value < 2 and value > 0 then
+futureposition58 = 0
+end
+
+value = position59 + position57 + position67 + position49 + position68 + position50 + position66 + position48 +0
+if value < 4 and value > 1 then
+futureposition58 = 1
+end
+
+value = position59 + position57 + position67 + position49 + position68 + position50 + position66 + position48 +0
+if value > 3 then
+futureposition58 = 0
+end
+
+
+print(x)
+value = position58 + position56 + position66 + position48 + position67 + position49 + position65 + position47 +0
+if value < 2 and value > 0 then
+futureposition57 = 0
+end
+
+value = position58 + position56 + position66 + position48 + position67 + position49 + position65 + position47 +0
+if value < 4 and value > 1 then
+futureposition57 = 1
+end
+
+value = position58 + position56 + position66 + position48 + position67 + position49 + position65 + position47 +0
+if value > 3 then
+futureposition57 = 0
+end
+
+
+print(x)
+value = position57 + position55 + position65 + position47 + position66 + position48 + position64 + position46 +0
+if value < 2 and value > 0 then
+futureposition56 = 0
+end
+
+value = position57 + position55 + position65 + position47 + position66 + position48 + position64 + position46 +0
+if value < 4 and value > 1 then
+futureposition56 = 1
+end
+
+value = position57 + position55 + position65 + position47 + position66 + position48 + position64 + position46 +0
+if value > 3 then
+futureposition56 = 0
+end
+
+
+print(x)
+value = position56 + position54 + position64 + position46 + position65 + position47 + position63 + position45 +0
+if value < 2 and value > 0 then
+futureposition55 = 0
+end
+
+value = position56 + position54 + position64 + position46 + position65 + position47 + position63 + position45 +0
+if value < 4 and value > 1 then
+futureposition55 = 1
+end
+
+value = position56 + position54 + position64 + position46 + position65 + position47 + position63 + position45 +0
+if value > 3 then
+futureposition55 = 0
+end
+
+
+print(x)
+value = position55 + position53 + position63 + position45 + position64 + position46 + position62 + position44 +0
+if value < 2 and value > 0 then
+futureposition54 = 0
+end
+
+value = position55 + position53 + position63 + position45 + position64 + position46 + position62 + position44 +0
+if value < 4 and value > 1 then
+futureposition54 = 1
+end
+
+value = position55 + position53 + position63 + position45 + position64 + position46 + position62 + position44 +0
+if value > 3 then
+futureposition54 = 0
+end
+
+
+print(x)
+value = position54 + position52 + position62 + position44 + position63 + position45 + position61 + position43 +0
+if value < 2 and value > 0 then
+futureposition53 = 0
+end
+
+value = position54 + position52 + position62 + position44 + position63 + position45 + position61 + position43 +0
+if value < 4 and value > 1 then
+futureposition53 = 1
+end
+
+value = position54 + position52 + position62 + position44 + position63 + position45 + position61 + position43 +0
+if value > 3 then
+futureposition53 = 0
+end
+
+
+print(x)
+value = position53 + position51 + position61 + position43 + position62 + position44 + position60 + position42 +0
+if value < 2 and value > 0 then
+futureposition52 = 0
+end
+
+value = position53 + position51 + position61 + position43 + position62 + position44 + position60 + position42 +0
+if value < 4 and value > 1 then
+futureposition52 = 1
+end
+
+value = position53 + position51 + position61 + position43 + position62 + position44 + position60 + position42 +0
+if value > 3 then
+futureposition52 = 0
+end
+
+
+print(x)
+value = position52 + position50 + position60 + position42 + position61 + position43 + position59 + position41 +0
+if value < 2 and value > 0 then
+futureposition51 = 0
+end
+
+value = position52 + position50 + position60 + position42 + position61 + position43 + position59 + position41 +0
+if value < 4 and value > 1 then
+futureposition51 = 1
+end
+
+value = position52 + position50 + position60 + position42 + position61 + position43 + position59 + position41 +0
+if value > 3 then
+futureposition51 = 0
+end
+
+
+print(x)
+value = position51 + position49 + position59 + position41 + position60 + position42 + position58 + position40 +0
+if value < 2 and value > 0 then
+futureposition50 = 0
+end
+
+value = position51 + position49 + position59 + position41 + position60 + position42 + position58 + position40 +0
+if value < 4 and value > 1 then
+futureposition50 = 1
+end
+
+value = position51 + position49 + position59 + position41 + position60 + position42 + position58 + position40 +0
+if value > 3 then
+futureposition50 = 0
+end
+
+
+print(x)
+value = position50 + position48 + position58 + position40 + position59 + position41 + position57 + position39 +0
+if value < 2 and value > 0 then
+futureposition49 = 0
+end
+
+value = position50 + position48 + position58 + position40 + position59 + position41 + position57 + position39 +0
+if value < 4 and value > 1 then
+futureposition49 = 1
+end
+
+value = position50 + position48 + position58 + position40 + position59 + position41 + position57 + position39 +0
+if value > 3 then
+futureposition49 = 0
+end
+
+
+print(x)
+value = position49 + position47 + position57 + position39 + position58 + position40 + position56 + position38 +0
+if value < 2 and value > 0 then
+futureposition48 = 0
+end
+
+value = position49 + position47 + position57 + position39 + position58 + position40 + position56 + position38 +0
+if value < 4 and value > 1 then
+futureposition48 = 1
+end
+
+value = position49 + position47 + position57 + position39 + position58 + position40 + position56 + position38 +0
+if value > 3 then
+futureposition48 = 0
+end
+
+
+print(x)
+value = position48 + position46 + position56 + position38 + position57 + position39 + position55 + position37 +0
+if value < 2 and value > 0 then
+futureposition47 = 0
+end
+
+value = position48 + position46 + position56 + position38 + position57 + position39 + position55 + position37 +0
+if value < 4 and value > 1 then
+futureposition47 = 1
+end
+
+value = position48 + position46 + position56 + position38 + position57 + position39 + position55 + position37 +0
+if value > 3 then
+futureposition47 = 0
+end
+
+
+print(x)
+value = position47 + position45 + position55 + position37 + position56 + position38 + position54 + position36 +0
+if value < 2 and value > 0 then
+futureposition46 = 0
+end
+
+value = position47 + position45 + position55 + position37 + position56 + position38 + position54 + position36 +0
+if value < 4 and value > 1 then
+futureposition46 = 1
+end
+
+value = position47 + position45 + position55 + position37 + position56 + position38 + position54 + position36 +0
+if value > 3 then
+futureposition46 = 0
+end
+
+
+print(x)
+value = position46 + position44 + position54 + position36 + position55 + position37 + position53 + position35 +0
+if value < 2 and value > 0 then
+futureposition45 = 0
+end
+
+value = position46 + position44 + position54 + position36 + position55 + position37 + position53 + position35 +0
+if value < 4 and value > 1 then
+futureposition45 = 1
+end
+
+value = position46 + position44 + position54 + position36 + position55 + position37 + position53 + position35 +0
+if value > 3 then
+futureposition45 = 0
+end
+
+
+print(x)
+value = position45 + position43 + position53 + position35 + position54 + position36 + position52 + position34 +0
+if value < 2 and value > 0 then
+futureposition44 = 0
+end
+
+value = position45 + position43 + position53 + position35 + position54 + position36 + position52 + position34 +0
+if value < 4 and value > 1 then
+futureposition44 = 1
+end
+
+value = position45 + position43 + position53 + position35 + position54 + position36 + position52 + position34 +0
+if value > 3 then
+futureposition44 = 0
+end
+
+
+print(x)
+value = position44 + position42 + position52 + position34 + position53 + position35 + position51 + position33 +0
+if value < 2 and value > 0 then
+futureposition43 = 0
+end
+
+value = position44 + position42 + position52 + position34 + position53 + position35 + position51 + position33 +0
+if value < 4 and value > 1 then
+futureposition43 = 1
+end
+
+value = position44 + position42 + position52 + position34 + position53 + position35 + position51 + position33 +0
+if value > 3 then
+futureposition43 = 0
+end
+
+
+print(x)
+value = position43 + position41 + position51 + position33 + position52 + position34 + position50 + position32 +0
+if value < 2 and value > 0 then
+futureposition42 = 0
+end
+
+value = position43 + position41 + position51 + position33 + position52 + position34 + position50 + position32 +0
+if value < 4 and value > 1 then
+futureposition42 = 1
+end
+
+value = position43 + position41 + position51 + position33 + position52 + position34 + position50 + position32 +0
+if value > 3 then
+futureposition42 = 0
+end
+
+
+print(x)
+value = position42 + position40 + position50 + position32 + position51 + position33 + position49 + position31 +0
+if value < 2 and value > 0 then
+futureposition41 = 0
+end
+
+value = position42 + position40 + position50 + position32 + position51 + position33 + position49 + position31 +0
+if value < 4 and value > 1 then
+futureposition41 = 1
+end
+
+value = position42 + position40 + position50 + position32 + position51 + position33 + position49 + position31 +0
+if value > 3 then
+futureposition41 = 0
+end
+
+
+print(x)
+value = position41 + position39 + position49 + position31 + position50 + position32 + position48 + position30 +0
+if value < 2 and value > 0 then
+futureposition40 = 0
+end
+
+value = position41 + position39 + position49 + position31 + position50 + position32 + position48 + position30 +0
+if value < 4 and value > 1 then
+futureposition40 = 1
+end
+
+value = position41 + position39 + position49 + position31 + position50 + position32 + position48 + position30 +0
+if value > 3 then
+futureposition40 = 0
+end
+
+
+print(x)
+value = position40 + position38 + position48 + position30 + position49 + position31 + position47 + position29 +0
+if value < 2 and value > 0 then
+futureposition39 = 0
+end
+
+value = position40 + position38 + position48 + position30 + position49 + position31 + position47 + position29 +0
+if value < 4 and value > 1 then
+futureposition39 = 1
+end
+
+value = position40 + position38 + position48 + position30 + position49 + position31 + position47 + position29 +0
+if value > 3 then
+futureposition39 = 0
+end
+
+
+print(x)
+value = position39 + position37 + position47 + position29 + position48 + position30 + position46 + position28 +0
+if value < 2 and value > 0 then
+futureposition38 = 0
+end
+
+value = position39 + position37 + position47 + position29 + position48 + position30 + position46 + position28 +0
+if value < 4 and value > 1 then
+futureposition38 = 1
+end
+
+value = position39 + position37 + position47 + position29 + position48 + position30 + position46 + position28 +0
+if value > 3 then
+futureposition38 = 0
+end
+
+
+print(x)
+value = position38 + position36 + position46 + position28 + position47 + position29 + position45 + position27 +0
+if value < 2 and value > 0 then
+futureposition37 = 0
+end
+
+value = position38 + position36 + position46 + position28 + position47 + position29 + position45 + position27 +0
+if value < 4 and value > 1 then
+futureposition37 = 1
+end
+
+value = position38 + position36 + position46 + position28 + position47 + position29 + position45 + position27 +0
+if value > 3 then
+futureposition37 = 0
+end
+
+
+print(x)
+value = position37 + position35 + position45 + position27 + position46 + position28 + position44 + position26 +0
+if value < 2 and value > 0 then
+futureposition36 = 0
+end
+
+value = position37 + position35 + position45 + position27 + position46 + position28 + position44 + position26 +0
+if value < 4 and value > 1 then
+futureposition36 = 1
+end
+
+value = position37 + position35 + position45 + position27 + position46 + position28 + position44 + position26 +0
+if value > 3 then
+futureposition36 = 0
+end
+
+
+print(x)
+value = position36 + position34 + position44 + position26 + position45 + position27 + position43 + position25 +0
+if value < 2 and value > 0 then
+futureposition35 = 0
+end
+
+value = position36 + position34 + position44 + position26 + position45 + position27 + position43 + position25 +0
+if value < 4 and value > 1 then
+futureposition35 = 1
+end
+
+value = position36 + position34 + position44 + position26 + position45 + position27 + position43 + position25 +0
+if value > 3 then
+futureposition35 = 0
+end
+
+
+print(x)
+value = position35 + position33 + position43 + position25 + position44 + position26 + position42 + position24 +0
+if value < 2 and value > 0 then
+futureposition34 = 0
+end
+
+value = position35 + position33 + position43 + position25 + position44 + position26 + position42 + position24 +0
+if value < 4 and value > 1 then
+futureposition34 = 1
+end
+
+value = position35 + position33 + position43 + position25 + position44 + position26 + position42 + position24 +0
+if value > 3 then
+futureposition34 = 0
+end
+
+
+print(x)
+value = position34 + position32 + position42 + position24 + position43 + position25 + position41 + position23 +0
+if value < 2 and value > 0 then
+futureposition33 = 0
+end
+
+value = position34 + position32 + position42 + position24 + position43 + position25 + position41 + position23 +0
+if value < 4 and value > 1 then
+futureposition33 = 1
+end
+
+value = position34 + position32 + position42 + position24 + position43 + position25 + position41 + position23 +0
+if value > 3 then
+futureposition33 = 0
+end
+
+
+print(x)
+value = position33 + position31 + position41 + position23 + position42 + position24 + position40 + position22 +0
+if value < 2 and value > 0 then
+futureposition32 = 0
+end
+
+value = position33 + position31 + position41 + position23 + position42 + position24 + position40 + position22 +0
+if value < 4 and value > 1 then
+futureposition32 = 1
+end
+
+value = position33 + position31 + position41 + position23 + position42 + position24 + position40 + position22 +0
+if value > 3 then
+futureposition32 = 0
+end
+
+
+print(x)
+value = position32 + position30 + position40 + position22 + position41 + position23 + position39 + position21 +0
+if value < 2 and value > 0 then
+futureposition31 = 0
+end
+
+value = position32 + position30 + position40 + position22 + position41 + position23 + position39 + position21 +0
+if value < 4 and value > 1 then
+futureposition31 = 1
+end
+
+value = position32 + position30 + position40 + position22 + position41 + position23 + position39 + position21 +0
+if value > 3 then
+futureposition31 = 0
+end
+
+
+print(x)
+value = position31 + position29 + position39 + position21 + position40 + position22 + position38 + position20 +0
+if value < 2 and value > 0 then
+futureposition30 = 0
+end
+
+value = position31 + position29 + position39 + position21 + position40 + position22 + position38 + position20 +0
+if value < 4 and value > 1 then
+futureposition30 = 1
+end
+
+value = position31 + position29 + position39 + position21 + position40 + position22 + position38 + position20 +0
+if value > 3 then
+futureposition30 = 0
+end
+
+
+print(x)
+value = position30 + position28 + position38 + position20 + position39 + position21 + position37 + position19 +0
+if value < 2 and value > 0 then
+futureposition29 = 0
+end
+
+value = position30 + position28 + position38 + position20 + position39 + position21 + position37 + position19 +0
+if value < 4 and value > 1 then
+futureposition29 = 1
+end
+
+value = position30 + position28 + position38 + position20 + position39 + position21 + position37 + position19 +0
+if value > 3 then
+futureposition29 = 0
+end
+
+
+print(x)
+value = position29 + position27 + position37 + position19 + position38 + position20 + position36 + position18 +0
+if value < 2 and value > 0 then
+futureposition28 = 0
+end
+
+value = position29 + position27 + position37 + position19 + position38 + position20 + position36 + position18 +0
+if value < 4 and value > 1 then
+futureposition28 = 1
+end
+
+value = position29 + position27 + position37 + position19 + position38 + position20 + position36 + position18 +0
+if value > 3 then
+futureposition28 = 0
+end
+
+
+print(x)
+value = position28 + position26 + position36 + position18 + position37 + position19 + position35 + position17 +0
+if value < 2 and value > 0 then
+futureposition27 = 0
+end
+
+value = position28 + position26 + position36 + position18 + position37 + position19 + position35 + position17 +0
+if value < 4 and value > 1 then
+futureposition27 = 1
+end
+
+value = position28 + position26 + position36 + position18 + position37 + position19 + position35 + position17 +0
+if value > 3 then
+futureposition27 = 0
+end
+
+
+print(x)
+value = position27 + position25 + position35 + position17 + position36 + position18 + position34 + position16 +0
+if value < 2 and value > 0 then
+futureposition26 = 0
+end
+
+value = position27 + position25 + position35 + position17 + position36 + position18 + position34 + position16 +0
+if value < 4 and value > 1 then
+futureposition26 = 1
+end
+
+value = position27 + position25 + position35 + position17 + position36 + position18 + position34 + position16 +0
+if value > 3 then
+futureposition26 = 0
+end
+
+
+print(x)
+value = position26 + position24 + position34 + position16 + position35 + position17 + position33 + position15 +0
+if value < 2 and value > 0 then
+futureposition25 = 0
+end
+
+value = position26 + position24 + position34 + position16 + position35 + position17 + position33 + position15 +0
+if value < 4 and value > 1 then
+futureposition25 = 1
+end
+
+value = position26 + position24 + position34 + position16 + position35 + position17 + position33 + position15 +0
+if value > 3 then
+futureposition25 = 0
+end
+
+
+print(x)
+value = position25 + position23 + position33 + position15 + position34 + position16 + position32 + position14 +0
+if value < 2 and value > 0 then
+futureposition24 = 0
+end
+
+value = position25 + position23 + position33 + position15 + position34 + position16 + position32 + position14 +0
+if value < 4 and value > 1 then
+futureposition24 = 1
+end
+
+value = position25 + position23 + position33 + position15 + position34 + position16 + position32 + position14 +0
+if value > 3 then
+futureposition24 = 0
+end
+
+
+print(x)
+value = position24 + position22 + position32 + position14 + position33 + position15 + position31 + position13 +0
+if value < 2 and value > 0 then
+futureposition23 = 0
+end
+
+value = position24 + position22 + position32 + position14 + position33 + position15 + position31 + position13 +0
+if value < 4 and value > 1 then
+futureposition23 = 1
+end
+
+value = position24 + position22 + position32 + position14 + position33 + position15 + position31 + position13 +0
+if value > 3 then
+futureposition23 = 0
+end
+
+
+print(x)
+value = position23 + position21 + position31 + position13 + position32 + position14 + position30 + position12 +0
+if value < 2 and value > 0 then
+futureposition22 = 0
+end
+
+value = position23 + position21 + position31 + position13 + position32 + position14 + position30 + position12 +0
+if value < 4 and value > 1 then
+futureposition22 = 1
+end
+
+value = position23 + position21 + position31 + position13 + position32 + position14 + position30 + position12 +0
+if value > 3 then
+futureposition22 = 0
+end
+
+
+print(x)
+value = position22 + position20 + position30 + position12 + position31 + position13 + position29 + position11 +0
+if value < 2 and value > 0 then
+futureposition21 = 0
+end
+
+value = position22 + position20 + position30 + position12 + position31 + position13 + position29 + position11 +0
+if value < 4 and value > 1 then
+futureposition21 = 1
+end
+
+value = position22 + position20 + position30 + position12 + position31 + position13 + position29 + position11 +0
+if value > 3 then
+futureposition21 = 0
+end
+
+
+print(x)
+value = position21 + position19 + position29 + position11 + position30 + position12 + position28 + position10 +0
+if value < 2 and value > 0 then
+futureposition20 = 0
+end
+
+value = position21 + position19 + position29 + position11 + position30 + position12 + position28 + position10 +0
+if value < 4 and value > 1 then
+futureposition20 = 1
+end
+
+value = position21 + position19 + position29 + position11 + position30 + position12 + position28 + position10 +0
+if value > 3 then
+futureposition20 = 0
+end
+
+
+print(x)
+value = position20 + position18 + position28 + position10 + position29 + position11 + position27 + position9 +0
+if value < 2 and value > 0 then
+futureposition19 = 0
+end
+
+value = position20 + position18 + position28 + position10 + position29 + position11 + position27 + position9 +0
+if value < 4 and value > 1 then
+futureposition19 = 1
+end
+
+value = position20 + position18 + position28 + position10 + position29 + position11 + position27 + position9 +0
+if value > 3 then
+futureposition19 = 0
+end
+
+
+print(x)
+value = position19 + position17 + position27 + position9 + position28 + position10 + position26 + position8 +0
+if value < 2 and value > 0 then
+futureposition18 = 0
+end
+
+value = position19 + position17 + position27 + position9 + position28 + position10 + position26 + position8 +0
+if value < 4 and value > 1 then
+futureposition18 = 1
+end
+
+value = position19 + position17 + position27 + position9 + position28 + position10 + position26 + position8 +0
+if value > 3 then
+futureposition18 = 0
+end
+
+
+print(x)
+value = position18 + position16 + position26 + position8 + position27 + position9 + position25 + position7 +0
+if value < 2 and value > 0 then
+futureposition17 = 0
+end
+
+value = position18 + position16 + position26 + position8 + position27 + position9 + position25 + position7 +0
+if value < 4 and value > 1 then
+futureposition17 = 1
+end
+
+value = position18 + position16 + position26 + position8 + position27 + position9 + position25 + position7 +0
+if value > 3 then
+futureposition17 = 0
+end
+
+
+print(x)
+value = position17 + position15 + position25 + position7 + position26 + position8 + position24 + position6 +0
+if value < 2 and value > 0 then
+futureposition16 = 0
+end
+
+value = position17 + position15 + position25 + position7 + position26 + position8 + position24 + position6 +0
+if value < 4 and value > 1 then
+futureposition16 = 1
+end
+
+value = position17 + position15 + position25 + position7 + position26 + position8 + position24 + position6 +0
+if value > 3 then
+futureposition16 = 0
+end
+
+
+print(x)
+value = position16 + position14 + position24 + position6 + position25 + position7 + position23 + position5 +0
+if value < 2 and value > 0 then
+futureposition15 = 0
+end
+
+value = position16 + position14 + position24 + position6 + position25 + position7 + position23 + position5 +0
+if value < 4 and value > 1 then
+futureposition15 = 1
+end
+
+value = position16 + position14 + position24 + position6 + position25 + position7 + position23 + position5 +0
+if value > 3 then
+futureposition15 = 0
+end
+
+
+print(x)
+value = position15 + position13 + position23 + position5 + position24 + position6 + position22 + position4 +0
+if value < 2 and value > 0 then
+futureposition14 = 0
+end
+
+value = position15 + position13 + position23 + position5 + position24 + position6 + position22 + position4 +0
+if value < 4 and value > 1 then
+futureposition14 = 1
+end
+
+value = position15 + position13 + position23 + position5 + position24 + position6 + position22 + position4 +0
+if value > 3 then
+futureposition14 = 0
+end
+
+
+print(x)
+value = position14 + position12 + position22 + position4 + position23 + position5 + position21 + position3 +0
+if value < 2 and value > 0 then
+futureposition13 = 0
+end
+
+value = position14 + position12 + position22 + position4 + position23 + position5 + position21 + position3 +0
+if value < 4 and value > 1 then
+futureposition13 = 1
+end
+
+value = position14 + position12 + position22 + position4 + position23 + position5 + position21 + position3 +0
+if value > 3 then
+futureposition13 = 0
+end
+
+
+print(x)
+value = position13 + position11 + position21 + position3 + position22 + position4 + position20 + position2 +0
+if value < 2 and value > 0 then
+futureposition12 = 0
+end
+
+value = position13 + position11 + position21 + position3 + position22 + position4 + position20 + position2 +0
+if value < 4 and value > 1 then
+futureposition12 = 1
+end
+
+value = position13 + position11 + position21 + position3 + position22 + position4 + position20 + position2 +0
+if value > 3 then
+futureposition12 = 0
+end
+
+
+print(x)
+value = position12 + position10 + position20 + position2 + position21 + position3 + position19 + position1 +0
+if value < 2 and value > 0 then
+futureposition11 = 0
+end
+
+value = position12 + position10 + position20 + position2 + position21 + position3 + position19 + position1 +0
+if value < 4 and value > 1 then
+futureposition11 = 1
+end
+
+value = position12 + position10 + position20 + position2 + position21 + position3 + position19 + position1 +0
+if value > 3 then
+futureposition11 = 0
+end
+
+
+print(x)
+value = position11 + position9 + position19 + position1 + position20 + position2 + position18 + position0 +0
+if value < 2 and value > 0 then
+futureposition10 = 0
+end
+
+value = position11 + position9 + position19 + position1 + position20 + position2 + position18 + position0 +0
+if value < 4 and value > 1 then
+futureposition10 = 1
+end
+
+value = position11 + position9 + position19 + position1 + position20 + position2 + position18 + position0 +0
+if value > 3 then
+futureposition10 = 0
+end
+
+
+print(x)
+value = position10 + position8 + position18 + position0 + position19 + position1 + position17 +0
+if value < 2 and value > 0 then
+futureposition9 = 0
+end
+
+value = position10 + position8 + position18 + position0 + position19 + position1 + position17 +0
+if value < 4 and value > 1 then
+futureposition9 = 1
+end
+
+value = position10 + position8 + position18 + position0 + position19 + position1 + position17 +0
+if value > 3 then
+futureposition9 = 0
+end
+
+
+print(x)
+value = position9 + position7 + position17 + position18 + position0 + position16 +0
+if value < 2 and value > 0 then
+futureposition8 = 0
+end
+
+value = position9 + position7 + position17 + position18 + position0 + position16 +0
+if value < 4 and value > 1 then
+futureposition8 = 1
+end
+
+value = position9 + position7 + position17 + position18 + position0 + position16 +0
+if value > 3 then
+futureposition8 = 0
+end
+
+
+print(x)
+value = position8 + position6 + position16 + position17 + position15 +0
+if value < 2 and value > 0 then
+futureposition7 = 0
+end
+
+value = position8 + position6 + position16 + position17 + position15 +0
+if value < 4 and value > 1 then
+futureposition7 = 1
+end
+
+value = position8 + position6 + position16 + position17 + position15 +0
+if value > 3 then
+futureposition7 = 0
+end
+
+
+print(x)
+value = position7 + position5 + position15 + position16 + position14 +0
+if value < 2 and value > 0 then
+futureposition6 = 0
+end
+
+value = position7 + position5 + position15 + position16 + position14 +0
+if value < 4 and value > 1 then
+futureposition6 = 1
+end
+
+value = position7 + position5 + position15 + position16 + position14 +0
+if value > 3 then
+futureposition6 = 0
+end
+
+
+print(x)
+value = position6 + position4 + position14 + position15 + position13 +0
+if value < 2 and value > 0 then
+futureposition5 = 0
+end
+
+value = position6 + position4 + position14 + position15 + position13 +0
+if value < 4 and value > 1 then
+futureposition5 = 1
+end
+
+value = position6 + position4 + position14 + position15 + position13 +0
+if value > 3 then
+futureposition5 = 0
+end
+
+
+print(x)
+value = position5 + position3 + position13 + position14 + position12 +0
+if value < 2 and value > 0 then
+futureposition4 = 0
+end
+
+value = position5 + position3 + position13 + position14 + position12 +0
+if value < 4 and value > 1 then
+futureposition4 = 1
+end
+
+value = position5 + position3 + position13 + position14 + position12 +0
+if value > 3 then
+futureposition4 = 0
+end
+
+
+print(x)
+value = position4 + position2 + position12 + position13 + position11 +0
+if value < 2 and value > 0 then
+futureposition3 = 0
+end
+
+value = position4 + position2 + position12 + position13 + position11 +0
+if value < 4 and value > 1 then
+futureposition3 = 1
+end
+
+value = position4 + position2 + position12 + position13 + position11 +0
+if value > 3 then
+futureposition3 = 0
+end
+
+
+print(x)
+value = position3 + position1 + position11 + position12 + position10 +0
+if value < 2 and value > 0 then
+futureposition2 = 0
+end
+
+value = position3 + position1 + position11 + position12 + position10 +0
+if value < 4 and value > 1 then
+futureposition2 = 1
+end
+
+value = position3 + position1 + position11 + position12 + position10 +0
+if value > 3 then
+futureposition2 = 0
+end
+
+
+print(x)
+value = position2 + position0 + position10 + position11 + position9 +0
+if value < 2 and value > 0 then
+futureposition1 = 0
+end
+
+value = position2 + position0 + position10 + position11 + position9 +0
+if value < 4 and value > 1 then
+futureposition1 = 1
+end
+
+value = position2 + position0 + position10 + position11 + position9 +0
+if value > 3 then
+futureposition1 = 0
+end
+
+
+print(x)
+value = position1 + position9 + position10 + position8 +0
+if value < 2 and value > 0 then
+futureposition0 = 0
+end
+
+value = position1 + position9 + position10 + position8 +0
+if value < 4 and value > 1 then
+futureposition0 = 1
+end
+
+value = position1 + position9 + position10 + position8 +0
+if value > 3 then
+futureposition0 = 0
+end
+
+
+print(i)
+position0=futureposition0
+position1=futureposition1
+position2=futureposition2
+position3=futureposition3
+position4=futureposition4
+position5=futureposition5
+position6=futureposition6
+position7=futureposition7
+position8=futureposition8
+position9=futureposition9
+position10=futureposition10
+position11=futureposition11
+position12=futureposition12
+position13=futureposition13
+position14=futureposition14
+position15=futureposition15
+position16=futureposition16
+position17=futureposition17
+position18=futureposition18
+position19=futureposition19
+position20=futureposition20
+position21=futureposition21
+position22=futureposition22
+position23=futureposition23
+position24=futureposition24
+position25=futureposition25
+position26=futureposition26
+position27=futureposition27
+position28=futureposition28
+position29=futureposition29
+position30=futureposition30
+position31=futureposition31
+position32=futureposition32
+position33=futureposition33
+position34=futureposition34
+position35=futureposition35
+position36=futureposition36
+position37=futureposition37
+position38=futureposition38
+position39=futureposition39
+position40=futureposition40
+position41=futureposition41
+position42=futureposition42
+position43=futureposition43
+position44=futureposition44
+position45=futureposition45
+position46=futureposition46
+position47=futureposition47
+position48=futureposition48
+position49=futureposition49
+position50=futureposition50
+position51=futureposition51
+position52=futureposition52
+position53=futureposition53
+position54=futureposition54
+position55=futureposition55
+position56=futureposition56
+position57=futureposition57
+position58=futureposition58
+position59=futureposition59
+position60=futureposition60
+position61=futureposition61
+position62=futureposition62
+position63=futureposition63
+position64=futureposition64
+position65=futureposition65
+position66=futureposition66
+position67=futureposition67
+position68=futureposition68
+position69=futureposition69
+position70=futureposition70
+position71=futureposition71
+position72=futureposition72
+position73=futureposition73
+position74=futureposition74
+position75=futureposition75
+position76=futureposition76
+position77=futureposition77
+position78=futureposition78
+position79=futureposition79
+position80=futureposition80
+
+x = x + 1
+
+print(x)
+
+end   
