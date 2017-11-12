@@ -1,7 +1,6 @@
 package interpreter
 
 import com.github.h0tk3y.betterParse.utils.Tuple2
-import com.sun.org.apache.xpath.internal.Arg
 import core.*
 import java.lang.Math.pow
 
@@ -126,17 +125,16 @@ fun runbody(body: List<AST>, environment: HashMap<String, Tuple2<String?, Any>>)
                                }
                            }
                            is TInt -> {
-                               left as Int
-                               right as Int
+                               try {
+                                   left as Int
+                                   right as Int
+                               } catch (e: ClassCastException) {
+                                   throw ClassCastException("type mismatch $left and $right should be ints")
+                               }
 
                                when(curr.op) {
                                    InOp.lt -> {
-                                       var bool = true
-
-                                       if(left > right)
-                                           bool = true
-
-                                       return bool
+                                       return right > left
                                    }
                                    InOp.gt -> {
                                        return left < right
@@ -211,7 +209,6 @@ fun runbody(body: List<AST>, environment: HashMap<String, Tuple2<String?, Any>>)
                                 }
 
                                 if (curr.elseBranch != null) {
-                                    println("adssssssssssssssssss")
                                     runbody(curr.elseBranch, environment)
                                 }
                             } else typeError(curr.cond, "should be bool")
@@ -220,7 +217,7 @@ fun runbody(body: List<AST>, environment: HashMap<String, Tuple2<String?, Any>>)
                     is VarDef -> {
                         //TODO make it so you cant over-define things.
                         val res = rec(curr.rhs, environment)
-                        environment[curr.lhs.id] = Tuple2("placeholder until we fix type parsing" as String?,res)
+                        environment[curr.lhs.id] = Tuple2(curr.lhs.ty.toString() as String?, res)
                     }
                     is UntypedVarDef -> {
                         val res = rec(curr.rhs, environment)
@@ -229,9 +226,9 @@ fun runbody(body: List<AST>, environment: HashMap<String, Tuple2<String?, Any>>)
                     is VarReassign -> {
                         //maybe assert that res is a value?
                         val res = rec(curr.rhs, environment)
-                        val existingvar = environment[curr.lhs.id]!!
+                        val existingType = environment[curr.lhs.id]?.t1
                         //TODO there needs to be some type checking here
-                        environment[curr.lhs.id] = Tuple2("placeholder" as String?, res)
+                        environment[curr.lhs.id] = Tuple2(existingType, res)
                     }
                     is FunDef -> {
                         environment[curr.id] = Tuple2(curr.returnType.toString() as String?, Tuple2(curr.args, curr.statements) as Any)
@@ -239,7 +236,11 @@ fun runbody(body: List<AST>, environment: HashMap<String, Tuple2<String?, Any>>)
                     is Return -> {
                         return ReturnBox(rec(curr.toReturn,environment))
                     }
-                //TODO return, while, closures,
+                    is While -> {
+                        //TODO fix cast sloppiness
+                        while(rec(curr.cond,environment) as Boolean) runbody(curr.body, environment)
+                    }
+                //TODO while, closures
                 }
             }
         }

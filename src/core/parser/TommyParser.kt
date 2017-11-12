@@ -98,7 +98,7 @@ class TommyParser : Grammar<List<AST>>() {
                           (-LPAR and parser(this::expr) and -RPAR)
 
     private val whileParser = -WHILE and parser(this::expr) and
-                                           -DO and zeroOrMore(parser(this::rootParser)) and
+                                           -DO and zeroOrMore(parser(this::astParser)) and
                                            -END map{(cond, statement) -> While(cond, statement)}
 
     //operators zone

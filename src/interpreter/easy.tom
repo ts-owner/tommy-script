@@ -1,34 +1,28 @@
 let multiply(a: Int, b: Int):Int =
-    return (a * b)
+    return (-a * b)
 end
 
 let numOfRecursions = 0
-let totalValue = 0
 
-
-let ackermannFunc(a: Int, b: Int):Int =
-    let calc
-
-    if(m == 0) then
-        n = n + 1
-    end
-
-    if (a > 0 and b == 0) then
-       a = a - 1
-       totalValue = totalValue + ackermannFunc(a, 1)
-    end
-
-    if (a > and b > 0) then
-        calc = ackermannFunc(a, b - 1)
-        a = a - 1
-        totalValue = ackermannFunc(a, calc) + totalValue
-    end
+let ackermannFunc(a: Int, b: Int, c: Int):Int =
+    return a
 end
 
 let y = 3
 
-
-
 let multiply1(a: Int, b: Int, c: Int):Int =
     return (a * b) - 100 + c
+end
+
+print(ackermannFunc(12,3,4))
+
+
+let x = 0
+print(x<4)
+print(3<4)
+print(false and true)
+
+while x<=50 do
+    print(x)
+    x = x+1
 end
