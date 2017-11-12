@@ -46,6 +46,7 @@ fun typeInfer(context : Map<String, Type>, expr : Expr) : Type {
 
                 return cod
             }
+            else -> throw TypeCheckingException(msg="aaaaaaaaaaaa",wrongExpr = currExpr)
         }
     }
     try {
