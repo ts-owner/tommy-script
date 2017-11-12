@@ -12,7 +12,7 @@ let multiply1(a: Int, b: Int, c: Int):Int =
     return (a * b) - 100 + c
 end
 
-
+5>5
 let multiply1(a: Int, b: Int, c: Int):Int =
     return (a * b) - 100 + c
 end
@@ -21,8 +21,8 @@ print(multiply(100,50))
 print(multiply1(100,50,4))
 print(y)
 
-if ( 6 == 5) then
-    8
+if (6 == 5) then
+    print(8)
 else
-    9
+    print(9)
 end

@@ -109,7 +109,9 @@ fun runbody(body: List<AST>, environment: HashMap<String, Tuple2<String?, Any>>)
                    is Infix -> {
                        val left = rec(curr.lhs, environment)
                        val right = rec(curr.rhs, environment)
-                       when(curr.op.type.cod) {
+                       //println("$left and $right, left and right, ${curr.op.type}")
+                       //TODO make this less gross
+                       when(curr.op.type.dom[0]) {
                            is TBool -> {
                                //make sure/assert that left and right are booleans
                                left as Boolean
@@ -194,22 +196,26 @@ fun runbody(body: List<AST>, environment: HashMap<String, Tuple2<String?, Any>>)
                             var trueyet = false
                             if (result) {
                                 //TODO handle environment properly
-                                runbody(curr.thenBranch,environment)
-                            } else if (curr.elifs != null) {
-                                curr.elifs.forEach { (a,b) ->
-                                    var res = rec(a,environment)
-                                    if(res is Boolean) {
+                                runbody(curr.thenBranch, environment)
+                                return Unit
+                            }
+                            if (curr.elifs != null) {
+                                curr.elifs.forEach { (a, b) ->
+                                    var res = rec(a, environment)
+                                    if (res is Boolean) {
                                         if (res) {
-                                            runbody(b,environment)
-                                            trueyet = true
+                                            runbody(b, environment)
+                                            return Unit
                                         }
                                     } else typeError(a, "should be bool")
                                 }
 
-                            } else if (curr.elseBranch != null && !trueyet) {
-                                runbody(curr.elseBranch,environment)
-                            }
-                        } else typeError(curr.cond, "should be bool")
+                                if (curr.elseBranch != null) {
+                                    println("adssssssssssssssssss")
+                                    runbody(curr.elseBranch, environment)
+                                }
+                            } else typeError(curr.cond, "should be bool")
+                        }
                     }
                     is VarDef -> {
                         //TODO make it so you cant over-define things.
@@ -233,11 +239,11 @@ fun runbody(body: List<AST>, environment: HashMap<String, Tuple2<String?, Any>>)
                     is Return -> {
                         return ReturnBox(rec(curr.toReturn,environment))
                     }
-                    //TODO return, while, closures,
+                //TODO return, while, closures,
                 }
             }
         }
-        return Unit
-    }
+    return Unit
+}
 
 data class ReturnBox(val content: Any)
