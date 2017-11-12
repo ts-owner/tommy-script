@@ -10,6 +10,12 @@ x="asdasd"
 4==3
 if not (3==4) then
     return a**2
+elseif 3==5 then
+    return 4+4
+elseif 4==6 then
+    return 8
+else
+    return "dsdd"
 end
 let multiply(a: Int, b: Int):Int =
     return (a * b)

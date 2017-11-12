@@ -38,6 +38,7 @@ class TommyParser : Grammar<List<AST>>() {
     private val IF by token("if\\b")
     private val THEN by token("then\\b")
     private val ELSE by token("else\\b")
+    private val ELSEIF by token("elseif\\b")
 
     //Literals
     private val NUM by token("\\d+")
@@ -201,9 +202,11 @@ class TommyParser : Grammar<List<AST>>() {
     //else
         //return "no"
     //end
-    private val ifParser = -IF and expr and -THEN and zeroOrMore(parser(this::astParser)) and
-            optional(-ELSE and zeroOrMore(parser(this::astParser))) and
-            -END map { (cond, body, elsebody) -> If(cond, body, elsebody) }
+    val ifParser = -IF and expr and -THEN and zeroOrMore(parser(this::astParser)) and
+             zeroOrMore(-ELSEIF and expr and -THEN and zeroOrMore(parser(this::astParser))) and optional(-ELSE and zeroOrMore(parser(this::astParser))) and -END map { (cond, body, elifs, elsebody) ->
+        If(cond, body, elsebody, elifs)
+    }
+
 
     //A statement is either return or a typed variable declaration or an untyped variable declaration or a function or reassigning a variable or an if
     //return (a * b)

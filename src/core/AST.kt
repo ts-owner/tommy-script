@@ -1,5 +1,7 @@
 package core
 
+import com.github.h0tk3y.betterParse.utils.Tuple2
+
 sealed class Type
 
 object TInt : Type() { override fun toString() = "Int" }
@@ -61,7 +63,7 @@ typealias Body = List<AST> //potentially temporary change to make parser work
 
 
 // Statements
-data class If(val cond : Expr, val thenBranch : Body, val elseBranch : Body? = null) : Statement() //empty if's are illegal, like python //TODO think about elseif/multiple else
+data class If(val cond : Expr, val thenBranch : Body, val elseBranch : Body? = null, val elifs : List<Tuple2<Expr, Body>>? = null) : Statement()
 data class VarDef(val lhs : AnnotatedVar, val rhs : Expr) : Statement() //TODO annotations should be optional
 data class UntypedVarDef(val lhs : Var, val rhs : Expr) : Statement() //TODO @Brendan this is ugly maybe there's a cleaner way
 data class VarReassign(val lhs : Var, val rhs: Expr) : Statement()
