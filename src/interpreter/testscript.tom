@@ -1,4 +1,5 @@
-let x: String = "test"
+let x: [String] = "test"
+x[2+2]: Bool
 let y: String = 13
 let x = "asdasd"
 let x: String = "flips\ter"
