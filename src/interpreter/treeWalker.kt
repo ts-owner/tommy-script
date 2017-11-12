@@ -247,7 +247,7 @@ fun runbody(body: List<AST>, environment: MutableMap<String, Tuple2<String?, Any
                 }
             }
         }
-    return "nothing ${curr}"
+    return Unit
 }
 
 data class ReturnBox(val content: Any)

@@ -1,0 +1,13 @@
+let x=3
+let fib(n: Int):Int =
+    if(n==1) then
+        return 1
+    elseif(n==0) then
+        return 1
+    else
+        let x = fib(n-1)
+        let y = fib(n-2)
+        return x+y
+    end
+end
+print(fib(10))
