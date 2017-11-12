@@ -16,15 +16,15 @@ fun opType(n : Int, ty : Type) = TFunction(List(n, { ty }), ty)
 fun relationOn(n : Int, ty : Type) = TFunction(List(n, { ty }), TBool)
 
 enum class PreOp(val asText : String, val type : TFunction, val precedence: Int) {
-     plus("+", opType(1, TInt),12), negate("-", opType(1, TInt), 12),
+     plus("+", opType(1, TInt),13), negate("-", opType(1, TInt), 13),
      not("not", opType(1, TBool),6);
 
      override fun toString() = asText
 }
 
 enum class InOp(val asText : String, val type : TFunction, val precedence: Int) {
-     plus("+", opType(2, TInt),10), negate("-", opType(2, TInt),10), times("*", opType(2, TInt),11),
-     div("/", opType(2, TInt),11), power("**", opType(2, TInt),13), concat("++", opType(2, TString),13),
+     plus("+", opType(2, TInt),10), negate("-", opType(2, TInt),10), mod("%", opType(2, TInt),12), times("*", opType(2, TInt),11),
+     div("/", opType(2, TInt),11), power("**", opType(2, TInt),14), concat("++", opType(2, TString),14),
      and("and", opType(2, TBool),5), or("or", opType(2, TBool),4), eqInt("==", relationOn(2, TInt),9),
      lt("<", relationOn(2, TInt),9), gt(">", relationOn(2, TInt),9), leq("<=", relationOn(2, TInt),9),
      geq(">=", relationOn(2, TInt),9), neq("!=", relationOn(2, TInt),9);
@@ -58,13 +58,12 @@ data class LBool(val value: Boolean) : Literal(TBool)
 object LUnit : Literal(TUnit) { override fun toString() = "unit" }
 
 sealed class Statement : AST()
-//typealias Body = List<Statement> //TODO @Brendan should't this be List<AST> so you can have funcalls in body
 typealias Body = List<AST> //potentially temporary change to make parser work
 
 
 // Statements
 data class If(val cond : Expr, val thenBranch : Body, val elseBranch : Body? = null, val elifs : List<Tuple2<Expr, Body>>? = null) : Statement()
-data class VarDef(val lhs : AnnotatedVar, val rhs : Expr) : Statement() //TODO annotations should be optional
+data class VarDef(val lhs : AnnotatedVar, val rhs : Expr) : Statement()
 data class UntypedVarDef(val lhs : Var, val rhs : Expr) : Statement() //TODO @Brendan this is ugly maybe there's a cleaner way
 data class VarReassign(val lhs : Var, val rhs: Expr) : Statement()
 data class FunDef(val id : String, val args : List<AnnotatedVar>, val returnType : Type,

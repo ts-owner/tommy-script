@@ -58,7 +58,7 @@ class TommyParser : Grammar<List<AST>>() {
     //LEXER OVER
 
     private val preOpSymbols = NOT or PLUS or MINUS
-    private val inOpSymbols = PLUS or MINUS or TIMES or DIV or CONCAT or AND or OR or EQU or LT or GT or LEQ or GEQ or NEQ
+    private val inOpSymbols = PLUS or MINUS or TIMES or DIV or CONCAT or AND or OR or EQU or LT or GT or LEQ or GEQ or NEQ or MOD
 
     private val idParser = id use { text }
 
@@ -95,19 +95,24 @@ class TommyParser : Grammar<List<AST>>() {
 
     //make the levels general. maybe need to pull request/add something
     //POWER FUNCTION (**)
-    val lvThirteenOperatorChain: Parser<Expr> = leftAssociative(preexpr, POW) { l, o, r ->
+    val lvFourteenOperatorChain: Parser<Expr> = leftAssociative(preexpr, POW) { l, o, r ->
         // use o for generalization
         Infix(InOp.power, l, r)
     }
 
     //PLUS AND MINUS INVERT EACH OTHER
-    val lvTwelveOperatorChain: Parser<Expr> = (PLUS or MINUS) * lvThirteenOperatorChain map { (a, b) ->
+    val lvThirteenOperatorChain: Parser<Expr> = (PLUS or MINUS) * lvFourteenOperatorChain map { (a, b) ->
         Prefix(if (a.type == PLUS) PreOp.plus else PreOp.negate, b)
+    }
+
+    //MODULUS (%)
+    var lvTwelveOperatorChain: Parser<Expr> = leftAssociative(lvThirteenOperatorChain or lvFourteenOperatorChain, MOD) { l, o, r ->
+        Infix(InOp.mod, l, r);
     }
 
     //give alternative path around prefix operator
     //MULTIPLICATION AND DIVISION (* and /)
-    val lvElevenOperatorChain: Parser<Expr> = leftAssociative(lvTwelveOperatorChain or lvThirteenOperatorChain, (DIV or TIMES)) { l, o, r ->
+    val lvElevenOperatorChain: Parser<Expr> = leftAssociative(lvThirteenOperatorChain or lvTwelveOperatorChain, (DIV or TIMES)) { l, o, r ->
         Infix(if (o.type == DIV) InOp.div else InOp.times, l, r)
     }
 
@@ -206,7 +211,6 @@ class TommyParser : Grammar<List<AST>>() {
              zeroOrMore(-ELSEIF and expr and -THEN and zeroOrMore(parser(this::astParser))) and optional(-ELSE and zeroOrMore(parser(this::astParser))) and -END map { (cond, body, elifs, elsebody) ->
         If(cond, body, elsebody, elifs)
     }
-
 
     //A statement is either return or a typed variable declaration or an untyped variable declaration or a function or reassigning a variable or an if
     //return (a * b)

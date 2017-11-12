@@ -10,10 +10,10 @@ x="asdasd"
 4==3
 if not (3==4) then
     return a**2
-elseif 3==5 then
+elseif (3==5) then
     return 4+4
-elseif 4==6 then
-    return 8
+elseif (4==6) then
+    return 8%3
 else
     return "dsdd"
 end
