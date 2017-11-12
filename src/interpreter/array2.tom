@@ -1,10 +1,19 @@
 let test = [true,3]
 let test1 = [5,6]
-print(test ++ test1 ++ 5)
+println(test ++ test1 ++ 5)
 test = test ++ 4
-let x = 0
-while (x<len(test)-1) do
-    x = x+1
-    print(test[x])
+let array = test ++ test1 ++ 4
+
+let arrayOfSize(n : Int):[Int]=
+    println(n)
 end
 
+let printArr(arr : [Int]):Unit=
+    let x = 0
+    while (x<len(test)-1) do
+        x = x+1
+        println(test[x])
+    end
+end
+
+printArr(test)
