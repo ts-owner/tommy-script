@@ -4,7 +4,7 @@ y="asdas\td"
 x=(100/4+5/4)*3
 
 let multiply(a: Int, b: Int):Int =
-    return (a * b)
+    return (-a * b)
 end
 
 
