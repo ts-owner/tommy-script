@@ -1,28 +1,17 @@
-let x = 3
-let y = 13
-y="asdas\td"
-x=(100/4+5/4)*3
-
 let multiply(a: Int, b: Int):Int =
     return (-a * b)
 end
 
+let numOfRecursions = 0 //Records the number of recursions to prevent a stack overflo
+
+let ackermannFunc(: Int, b: Int, c: Int):Int =
+    if()
+end
+
+let y = 3
+
+
 
 let multiply1(a: Int, b: Int, c: Int):Int =
     return (a * b) - 100 + c
-end
-
-5>5
-let multiply1(a: Int, b: Int, c: Int):Int =
-    return (a * b) - 100 + c
-end
-
-print(multiply(100,50))
-print(multiply1(100,50,4))
-print(y)
-
-if (6 == 5) then
-    print(8)
-else
-    print(9)
 end

@@ -36,7 +36,7 @@ class TommyParser : Grammar<List<AST>>() {
     //keywords
     private val NOT by token("not\\b") //@Brendan maybe not should require a space after/before it?
     private val RETURN by token("return\\b")
-    private val END by token("end\\b")
+    private val END by token("end")
     private val IF by token("if\\b")
     private val THEN by token("then\\b")
     private val ELSE by token("else\\b")
@@ -98,7 +98,7 @@ class TommyParser : Grammar<List<AST>>() {
                           (-LPAR and parser(this::expr) and -RPAR)
 
     private val whileParser = -WHILE and parser(this::expr) and
-                                           -DO and zeroOrMore(parser(this::statement)) and
+                                           -DO and zeroOrMore(parser(this::rootParser)) and
                                            -END map{(cond, statement) -> While(cond, statement)}
 
     //operators zone
