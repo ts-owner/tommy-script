@@ -8,6 +8,14 @@ object TInt : Type() { override fun toString() = "Int" }
 object TString : Type() { override fun toString() = "String" }
 object TBool : Type() { override fun toString() = "Bool" }
 object TUnit : Type() { override fun toString() = "Unit" }
+data class TArray(val clazz : Type) : Type() {
+    override fun toString(): String {
+        return "[" + clazz.toString() + "]"
+    }
+    fun getClass(): Type {
+        return clazz
+    }
+}
 data class TFunction(val dom : List<Type>, val cod : Type) : Type() {
      override fun toString() = "(${dom.joinToString()}) → $cod"
 }

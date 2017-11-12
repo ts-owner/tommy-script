@@ -50,6 +50,7 @@ class TommyParser : Grammar<List<AST>>() {
     private val stringSymbol by token("String")
     private val intSymbol by token("Int")
     private val boolSymbol by token("Bool")
+    private val arraySymbol by token("(?<=\\[)(String|Bool|Int)(?=\\])")
 
     private val id by token("\\w+")
 
@@ -63,9 +64,12 @@ class TommyParser : Grammar<List<AST>>() {
     private val idParser = id use { text }
 
     //Parses a string to a TString or an int to a TInt or a boolean to a TBool
-    private val typeParser = stringSymbol.asJust(TString) or
+    private val primitiveTypeParser = stringSymbol.asJust(TString) or
                              intSymbol.asJust(TInt) or
                              boolSymbol.asJust(TBool)
+
+    private val typeParser = primitiveTypeParser or
+            arraySymbol.bind { primitiveTypeParser }
 
     //Parses things like escape characters
     private val stringParser = STRING.map { match -> StringParser().tryParseToEnd(match.text) }
