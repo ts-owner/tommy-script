@@ -57,6 +57,9 @@ data class Prefix(val op : PreOp, val expr : Expr) : Expr()
 data class Infix(val op : InOp, val lhs : Expr, val rhs : Expr) : Expr()
 data class FunCall(val id : String, val args : List<Expr>) : Expr()
 
+data class ArrayGet(val name : String, val index : Expr) : Statement()
+data class ArraySet(val name : String, val index : Expr, val newObj : Statement) : Statement()
+
 // Literals
 sealed class Literal(val ty : Type) : Expr()
 

@@ -11,6 +11,8 @@ class TommyParser : Grammar<List<AST>>() {
     //Symbols
     private val LPAR by token("\\(")
     private val RPAR by token("\\)")
+    private val LBRA by token("\\[")
+    private val RBRA by token("\\]")
     private val EQU by token("==")
     private val NEQ by token("!=")
     private val LEQ by token("<=")
@@ -52,7 +54,6 @@ class TommyParser : Grammar<List<AST>>() {
     private val stringSymbol by token("String")
     private val intSymbol by token("Int")
     private val boolSymbol by token("Bool")
-    private val arraySymbol by token("(?<=\\[)(String|Bool|Int)(?=\\])")
 
     private val id by token("\\w+")
 
@@ -60,18 +61,15 @@ class TommyParser : Grammar<List<AST>>() {
 
     //LEXER OVER
 
-    private val preOpSymbols = NOT or PLUS or MINUS
-    private val inOpSymbols = PLUS or MINUS or TIMES or DIV or CONCAT or AND or OR or EQU or LT or GT or LEQ or GEQ or NEQ or MOD
-
     private val idParser = id use { text }
 
-    //Parses a string to a TString or an int to a TInt or a boolean to a TBool
-    private val primitiveTypeParser = stringSymbol.asJust(TString) or
-                             intSymbol.asJust(TInt) or
-                             boolSymbol.asJust(TBool)
+    private val arrayTypeParser = -LBRA and parser(this::typeParser).map { TArray(it) } and -RBRA
 
-    private val typeParser = primitiveTypeParser or
-            arraySymbol.bind { primitiveTypeParser }
+    //Parses a string to a TString or an int to a TInt or a boolean to a TBool
+    private val typeParser : Parser<Type> = stringSymbol.asJust(TString) or
+            intSymbol.asJust(TInt) or
+            boolSymbol.asJust(TBool) or
+            arrayTypeParser
 
     //Parses things like escape characters
     private val stringParser = STRING.map { match -> StringParser().tryParseToEnd(match.text) }
@@ -90,6 +88,10 @@ class TommyParser : Grammar<List<AST>>() {
 
     //Maps any non-white-space to a variable
     private val varParser = idParser.map(::Var)
+
+    private val arrayGetParser = id and -LBRA and parser(this::expr) and -RBRA and -COLON and parser(this::expr) map { (name, index) -> ArrayGet(name.text, index) }
+    private val arraySetParser = id and -LBRA and parser(this::expr) and -RBRA and -EQUALS and
+            parser(this::statement) map { (name, index, newObj) -> ArraySet(name.text, index, newObj)}
 
     //switch out preexper thing with parser(this::expr) later, if it works with preexpr
     private val preexpr = literalParser or funCallParser or varParser or
@@ -117,7 +119,7 @@ class TommyParser : Grammar<List<AST>>() {
 
     //MODULUS (%)
     var lvTwelveOperatorChain: Parser<Expr> = leftAssociative(lvThirteenOperatorChain or lvFourteenOperatorChain, MOD) { l, o, r ->
-        Infix(InOp.mod, l, r);
+        Infix(InOp.mod, l, r)
     }
 
     //give alternative path around prefix operator
@@ -224,9 +226,10 @@ class TommyParser : Grammar<List<AST>>() {
 
     //A statement is either return or a typed variable declaration or an untyped variable declaration or a function or reassigning a variable or an if
     //return (a * b)
-    private val statement : Parser<Statement> = returnParser or varDefParser or untypedVarDefParser or funDefParser or varReassignParser or ifParser or whileParser
+    private val statement : Parser<Statement> = returnParser or varDefParser or untypedVarDefParser or funDefParser or
+            varReassignParser or ifParser or whileParser or arrayGetParser or arraySetParser
 
-    //An ast is an expression or a statement
+            //An ast is an expression or a statement
     private val astParser = statement or expr //order matters here for assignment!
     //The root of the program is one or more asts (one or more expressions/statements)
     override val rootParser = oneOrMore(astParser) //TODO make this correct
