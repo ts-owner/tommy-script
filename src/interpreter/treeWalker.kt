@@ -134,15 +134,10 @@ fun runbody(body: List<AST>, environment: HashMap<String, Tuple2<String?, Any>>)
 
                                when(curr.op) {
                                    InOp.lt -> {
-                                       var bool = true
-
-                                       if(left > right)
-                                           bool = true
-
-                                       return bool
+                                       return right < left
                                    }
                                    InOp.gt -> {
-                                       return left < right
+                                       return left > right
                                    }
                                    InOp.eqInt -> {
                                        return left == right
@@ -241,7 +236,7 @@ fun runbody(body: List<AST>, environment: HashMap<String, Tuple2<String?, Any>>)
                     is Return -> {
                         return ReturnBox(rec(curr.toReturn,environment))
                     }
-                //TODO while, closures,
+                //TODO while, closures
                 }
             }
         }
