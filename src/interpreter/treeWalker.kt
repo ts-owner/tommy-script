@@ -2,6 +2,7 @@ package interpreter
 
 import core.*
 import jdk.internal.org.objectweb.asm.tree.TypeInsnNode
+import java.lang.Math.pow
 import kotlin.test.assertTrue
 
 
@@ -70,14 +71,60 @@ fun walkTree(debug : Boolean, tree : List<AST>) {
                                }
                            }
                            is TInt -> {
-                               left as Number
-                               right as Number
+                               left as Int
+                               right as Int
+
                                when(curr.op) {
                                    InOp.lt -> {
-                                       return left > right
+                                       var bool = true
+
+                                       if(left > right)
+                                           bool = true
+
+                                       return bool
                                    }
                                    InOp.gt -> {
                                        return left < right
+                                   }
+                                   InOp.eqInt -> {
+                                       return left == right
+                                   }
+                                   InOp.plus ->{
+                                       return left + right
+                                   }
+                                   InOp.negate -> { //FLAGGED, ASK ABOUT THIS
+                                       return left - right
+                                   }
+                                   InOp.mod -> {
+                                       var result = left.rem(right)
+
+                                      return result
+                                   }
+                                   InOp.times -> {
+                                       return left.times(right)
+                                   }
+                                   InOp.div -> {
+                                       return left/right
+                                   }
+                                   InOp.power -> { //FLAGGED, MAYBE ASK ABOUT THIS
+                                       var power: Int = right
+                                       var result = 1
+
+                                       while(power > 0) {
+                                           result *= left
+                                           power -= 1
+                                       }
+
+                                       return pow( left as Double, right as Double)
+                                   }
+                                   InOp.leq -> {
+                                       return left <= right
+                                   }
+                                   InOp.geq -> {
+                                       return left >= right
+                                   }
+                                   InOp.neq -> {
+                                       return left != right
                                    }
                                }
                            }
@@ -92,7 +139,7 @@ fun walkTree(debug : Boolean, tree : List<AST>) {
                         //TODO after bools are implemented
                         rec(curr.cond, environment)
                     }
-                    is
+                    //is
 
                 }
             }
