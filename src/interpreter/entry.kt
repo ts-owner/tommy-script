@@ -13,13 +13,18 @@ fun main(args: Array<String>) {
     assertEquals(TInt, typeInfer(mapOf("a" to TInt), testExpression))
     assertFails { typeInfer(mapOf("a" to TBool), testExpression) }
 
-    //TODO remove hardcoded filename
-    //interpreter/testscript is a more complete example
+    //read file from args
     var exampleScript = File(args.first())
     var lines = exampleScript.readLines()
-    println(lines)
 
-    TommyParser().parseToEnd(exampleScript.inputStream()).forEach { println(it) }
+    //hardcode that second arg is debug
+    var debug = args.contains("debug")
+
+    if (debug) println(lines)
+
+    var parseResult = TommyParser().parseToEnd(exampleScript.inputStream())
+    walkTree(debug, parseResult)
+
 
 }
 //TODO elseif, all the dangling operators (from python reference, array access, etc)
