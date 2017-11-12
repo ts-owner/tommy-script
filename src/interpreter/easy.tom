@@ -2,10 +2,27 @@ let multiply(a: Int, b: Int):Int =
     return (a * b)
 end
 
-let numOfRecursions = 0 //Records the number of recursions to prevent a stack overflo
+let numOfRecursions = 0
+let totalValue = 0
 
-let ackermannFunc(: Int, b: Int, c: Int):Int =
-    if()
+
+let ackermannFunc(a: Int, b: Int):Int =
+    let calc
+
+    if(m == 0) then
+        n = n + 1
+    end
+
+    if (a > 0 and b == 0) then
+       a = a - 1
+       totalValue = totalValue + ackermannFunc(a, 1)
+    end
+
+    if (a > and b > 0) then
+        calc = ackermannFunc(a, b - 1)
+        a = a - 1
+        totalValue = ackermannFunc(a, calc) + totalValue
+    end
 end
 
 let y = 3
