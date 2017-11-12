@@ -1,15 +1,9 @@
-let multiply(a: Int, b: Int):Int =
-    return (-a * b)
+let test = "asfdasdf"
+let gcd(x: Int, y: Int):Int =
+    if(y==0) then return x
+    else return gcd(y, x%y) end
 end
 
-let numOfRecursions = 0
-let fullValue = 0
+print(gcd(54,24))
+print(gcd(48,180))
 
-let Ack(m: Int, n: Int):Int =
-    if(m==0) then return n + 1
-    elseif(m>0 and n==0) then return Ack(m-1,1)
-    elseif(m>0 and n>0) then return Ack(m-1,Ack(m, n-1))
-    end
-end
-
-print(Ack(3,2))
