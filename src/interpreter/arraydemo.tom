@@ -11,4 +11,3 @@ while (x<10) do
         print(test[x])
     end
 end
-

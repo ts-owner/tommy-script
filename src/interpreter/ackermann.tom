@@ -1,4 +1,4 @@
-let multiply(a: Int, b: Int):Int =
+ let multiply(a: Int, b: Int):Int =
     return (-a * b)
 end
 
