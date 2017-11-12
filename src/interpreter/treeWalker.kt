@@ -57,7 +57,8 @@ fun runbody(body: List<AST>, environment: MutableMap<String, Tuple2<String?, Any
                    is FunCall -> {
                        //TODO put std lib in other file
                        //std lib
-                       if(curr.id=="print") println(rec(curr.args.first(),environment))
+                       if(curr.id=="println") println(rec(curr.args.first(),environment))
+                       if(curr.id=="print") print(rec(curr.args.first(),environment))
                        //the worst line of code ever written
                        if(curr.id=="len") return (environment[(curr.args.first() as Var).id]!!.t2 as MutableList<*>).size
 
