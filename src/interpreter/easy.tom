@@ -2,3 +2,8 @@ let x = 3
 let y: Int = 13
 y=4
 x="asdas\td"
+if ( 6 == 5) then
+    8
+else
+    9
+end
