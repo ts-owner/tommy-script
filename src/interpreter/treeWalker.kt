@@ -1,13 +1,28 @@
 package interpreter
 
+import com.github.h0tk3y.betterParse.utils.Tuple2
 import core.*
-import jdk.internal.org.objectweb.asm.tree.TypeInsnNode
-import kotlin.test.assertTrue
+import java.lang.Math.pow
 
 
 fun walkTree(debug : Boolean, tree : List<AST>) {
     if(debug) println("starting tree walk interpreter")
-    fun rec(curr: AST, environment: Map<String, Any>):Any {
+    runbody(tree, HashMap())
+}
+
+fun runbody(body: List<AST>, environment: HashMap<String, Tuple2<String?, Any>>) {
+    //environment: variable name-> (type, value)
+    //preserve hashmap for each one
+    body.forEach { rec(it, environment) }
+    //println(environment)
+
+}
+//TODO properly use typeError, handle double/int properly
+//
+ fun rec(curr: AST, environment: HashMap<String, Tuple2<String?, Any>>):Any {
+        fun typeError(expr: Expr, what: String) {
+            throw TypeCheckingException(wrongExpr = expr, msg=what)
+        }
         when(curr) {
             is Literal -> {
                 when(curr) {
@@ -18,7 +33,11 @@ fun walkTree(debug : Boolean, tree : List<AST>) {
             }
             is Expression -> {
                when(curr) {
-                   is Var -> return environment[curr.id]!!
+                   is Var -> return environment[curr.id]!!.t2
+                   is FunCall -> {
+                       //TODO this
+                       if(curr.id=="print") println(rec(curr.args.first(),environment))
+                   }
                    is Prefix -> {
                        when(curr.op.type.cod) {
                            is TBool -> {
@@ -30,7 +49,7 @@ fun walkTree(debug : Boolean, tree : List<AST>) {
                                       if (exp is Boolean) {
                                           return  !exp
                                       } else {
-                                          //type error
+                                          typeError(curr.expr, "should be bool")
                                       }
                                   }
                               }
@@ -70,14 +89,60 @@ fun walkTree(debug : Boolean, tree : List<AST>) {
                                }
                            }
                            is TInt -> {
-                               left as Number
-                               right as Number
+                               left as Int
+                               right as Int
+
                                when(curr.op) {
                                    InOp.lt -> {
-                                       return left > right
+                                       var bool = true
+
+                                       if(left > right)
+                                           bool = true
+
+                                       return bool
                                    }
                                    InOp.gt -> {
                                        return left < right
+                                   }
+                                   InOp.eqInt -> {
+                                       return left == right
+                                   }
+                                   InOp.plus ->{
+                                       return left + right
+                                   }
+                                   InOp.negate -> { //FLAGGED, ASK ABOUT THIS
+                                       return left - right
+                                   }
+                                   InOp.mod -> {
+                                       var result = left.rem(right)
+
+                                      return result
+                                   }
+                                   InOp.times -> {
+                                       return left.times(right)
+                                   }
+                                   InOp.div -> {
+                                       return left/right
+                                   }
+                                   InOp.power -> { //FLAGGED, MAYBE ASK ABOUT THIS
+                                       var power: Int = right
+                                       var result = 1
+
+                                       while(power > 0) {
+                                           result *= left
+                                           power -= 1
+                                       }
+
+                                       return pow( left as Double, right as Double)
+                                   }
+                                   InOp.leq -> {
+                                       return left <= right
+                                   }
+                                   InOp.geq -> {
+                                       return left >= right
+                                   }
+                                   InOp.neq -> {
+                                       return left != right
                                    }
                                }
                            }
@@ -89,13 +154,47 @@ fun walkTree(debug : Boolean, tree : List<AST>) {
                 when(curr) {
                     is If -> {
                         //make sure it is boolean, maybe
-                        //TODO after bools are implemented
-                        rec(curr.cond, environment)
-                    }
-                    is
+                        val result = rec(curr.cond, environment)
+                        if (result is Boolean) {
+                            var trueyet = false
+                            if (result) {
+                                //TODO handle environment properly
+                                runbody(curr.thenBranch,environment)
+                            } else if (curr.elifs != null) {
+                                curr.elifs.forEach { (a,b) ->
+                                    var res = rec(a,environment)
+                                    if(res is Boolean) {
+                                        if (res) {
+                                            runbody(b,environment)
+                                            trueyet = true
+                                        }
+                                    } else typeError(a, "should be bool")
+                                }
 
+                            } else if (curr.elseBranch != null && !trueyet) {
+                                runbody(curr.elseBranch,environment)
+                            }
+                        } else typeError(curr.cond, "should be bool")
+                    }
+                    is VarDef -> {
+                        //TODO make it so you cant over-define things.
+                        val res = rec(curr.rhs, environment)
+                        environment[curr.lhs.id] = Tuple2("placeholder until we fix type parsing" as String?,res)
+                    }
+                    is UntypedVarDef -> {
+                        val res = rec(curr.rhs, environment)
+                        environment[curr.lhs.id] = Tuple2(null as String?, res)
+                    }
+                    is VarReassign -> {
+                        //maybe assert that res is a value?
+                        val res = rec(curr.rhs, environment)
+                        val existingvar = environment[curr.lhs.id]!!
+                        //TODO there needs to be some type checking here
+                        environment[curr.lhs.id] = Tuple2("placeholder" as String?, res)
+                    }
+                    //TODO fundef, return, while, funcall, functions at all, closures, runbody
                 }
             }
         }
+        return Unit
     }
-}

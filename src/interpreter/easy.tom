@@ -1,7 +1,10 @@
 let x = 3
-let y: Int = 13
-y=4
-x="asdas\td"
+let y = 13
+y="asdas\td"
+x=(100/4+5/4)*3
+print(x)
+print(y)
+
 if ( 6 == 5) then
     8
 else
