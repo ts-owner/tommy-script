@@ -201,6 +201,12 @@ fun runbody(body: List<AST>, environment: MutableMap<String, Tuple2<String?, Any
                                }
                            }
                            is TString -> {
+                               if(left is MutableList<*> && right is MutableList<*>) {
+                                   left as MutableList<Any>
+                                   right as MutableList<Any>
+                                   left.addAll(right)
+                                   return left
+                               }
                                if (left is MutableList<*>) {
                                    println("asdads")
                                    left as MutableList<Any>
