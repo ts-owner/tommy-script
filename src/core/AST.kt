@@ -8,12 +8,9 @@ object TInt : Type() { override fun toString() = "Int" }
 object TString : Type() { override fun toString() = "String" }
 object TBool : Type() { override fun toString() = "Bool" }
 object TUnit : Type() { override fun toString() = "Unit" }
-data class TArray(val clazz : Type) : Type() {
+object TArray : Type() {
     override fun toString(): String {
-        return "[" + clazz.toString() + "]"
-    }
-    fun getClass(): Type {
-        return clazz
+        return "[TODO]"
     }
 }
 data class TFunction(val dom : List<Type>, val cod : Type) : Type() {
@@ -57,8 +54,7 @@ data class Prefix(val op : PreOp, val expr : Expr) : Expr()
 data class Infix(val op : InOp, val lhs : Expr, val rhs : Expr) : Expr()
 data class FunCall(val id : String, val args : List<Expr>) : Expr()
 
-data class ArrayGet(val name : String, val index : Expr) : Statement()
-data class ArraySet(val name : String, val index : Expr, val newObj : Statement) : Statement()
+data class ArrayAccess(val name : Var, val index : Expr) : Expr()
 
 // Literals
 sealed class Literal(val ty : Type) : Expr()
@@ -66,6 +62,7 @@ sealed class Literal(val ty : Type) : Expr()
 data class LInt(val value: Int) : Literal(TInt)
 data class LString(val value: String) : Literal(TString)
 data class LBool(val value: Boolean) : Literal(TBool)
+data class LArray(val values: List<Literal>): Literal(TArray)
 object LUnit : Literal(TUnit) { override fun toString() = "unit" }
 
 sealed class Statement : AST()
@@ -77,6 +74,7 @@ data class If(val cond : Expr, val thenBranch : Body, val elseBranch : Body? = n
 data class VarDef(val lhs : AnnotatedVar, val rhs : Expr) : Statement()
 data class UntypedVarDef(val lhs : Var, val rhs : Expr) : Statement() //TODO @Brendan this is ugly maybe there's a cleaner way
 data class VarReassign(val lhs : Var, val rhs: Expr) : Statement()
+data class ArrayAssignment(val lhs : Var, val index: Expr, val rhs: Expr) : Statement()
 data class FunDef(val id : String, val args : List<AnnotatedVar>, val returnType : Type,
                   val statements : Body) : Statement()
 data class Return(val toReturn : Expr) : Statement()

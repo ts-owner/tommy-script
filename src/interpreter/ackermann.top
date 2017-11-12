@@ -11,5 +11,6 @@ let ack(m: Int, n: Int):Int =
     elseif(m>0 and n>0) then return ack(m-1,Ack(m, n-1))
     end
 end
-
-print(ack(3,2))
+4 ++ "asdfasdf"
+"afdasdf" ++ 4
+print(4 ++ "asdf")

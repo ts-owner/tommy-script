@@ -63,13 +63,13 @@ class TommyParser : Grammar<List<AST>>() {
 
     private val idParser = id use { text }
 
-    private val arrayTypeParser = -LBRA and parser(this::typeParser).map { TArray(it) } and -RBRA
+    //private val arrayTypeParser = -LBRA and parser(this::typeParser) and -RBRA map { TArray(it) }
 
     //Parses a string to a TString or an int to a TInt or a boolean to a TBool
     private val typeParser : Parser<Type> = stringSymbol.asJust(TString) or
             intSymbol.asJust(TInt) or
-            boolSymbol.asJust(TBool) or
-            arrayTypeParser
+            boolSymbol.asJust(TBool)
+            //arrayTypeParser
 
     //Parses things like escape characters
     private val stringParser = STRING.map { match -> StringParser().tryParseToEnd(match.text) }
@@ -78,7 +78,11 @@ class TommyParser : Grammar<List<AST>>() {
     private val numParser = NUM use { LInt(text.toInt()) } //Parses numbers into LInts
     private val trueParser = TRUE.asJust(LBool(true)) //Parses "true" into a boolean (LBool) `true`
     private val falseParser = FALSE.asJust(LBool(false)) //Parses "false" into a boolean (LBool) `false`
-    private val literalParser = stringParser or numParser or trueParser or falseParser //Parses the four literals (strings, numbers, booleans (true/false))
+    //TODO make this expr eventually
+    private val arrayLiteralParser = -LBRA and separatedTerms(parser(this::preLiteral), COMMA, acceptZero = true) and -RBRA map { LArray(it) }
+
+    private val preLiteral = stringParser or numParser or trueParser or falseParser
+    private val literalParser = preLiteral or arrayLiteralParser
 
     //Any amount of non-white-space followed by a ( and any number of parameters (`acceptZero = true` means it can be no parameters) and a )
     //Maps the parameters (`args`) and function name (`name.text`) to a function call
@@ -89,12 +93,10 @@ class TommyParser : Grammar<List<AST>>() {
     //Maps any non-white-space to a variable
     private val varParser = idParser.map(::Var)
 
-    private val arrayGetParser = id and -LBRA and parser(this::expr) and -RBRA and -COLON and parser(this::expr) map { (name, index) -> ArrayGet(name.text, index) }
-    private val arraySetParser = id and -LBRA and parser(this::expr) and -RBRA and -EQUALS and
-            parser(this::statement) map { (name, index, newObj) -> ArraySet(name.text, index, newObj)}
+    private val arrayGetParser :Parser<Expr> = varParser and -LBRA and parser(this::expr) and -RBRA and -COLON and parser(this::expr) map { (name, index) -> ArrayAccess(name, index) }
 
     //switch out preexper thing with parser(this::expr) later, if it works with preexpr
-    private val preexpr = literalParser or funCallParser or varParser or
+    private val preexpr = literalParser or funCallParser or varParser or arrayGetParser or
                           (-LPAR and parser(this::expr) and -RPAR)
 
     private val whileParser = -WHILE and parser(this::expr) and
@@ -106,6 +108,8 @@ class TommyParser : Grammar<List<AST>>() {
     //TODO make this not seizure material
 
     //make the levels general. maybe need to pull request/add something
+    //make it so there can't be a space between
+
     //POWER FUNCTION (**)
     val lvFourteenOperatorChain: Parser<Expr> = leftAssociative(preexpr, POW) { l, o, r ->
         // use o for generalization
@@ -158,11 +162,19 @@ class TommyParser : Grammar<List<AST>>() {
         Infix(InOp.or, l, r);
     }
 
+    //CONCAT
+    val lvThreeOperatorChain: Parser<Expr> = rightAssociative(lvFourOperatorChain, CONCAT) { l, _, r ->
+        Infix(InOp.concat, l, r);
+    }
+
 
     //The chain works by calling lvFourOperatorChain, which in turn calls lvFiveOperatorChain and then does its thing.
     // But lvFiveOperatorChain calls lvSixOperatorChain, etc.
-    private val expr = lvFourOperatorChain
+    private val expr = lvThreeOperatorChain
     //end operators zone
+
+    private val arraySetParser = varParser and -LBRA and parser(this::expr) and -RBRA and -EQUALS and
+            parser(this::expr) map { (name, index, newObj) -> ArrayAssignment(name, index, newObj)}
 
     //Types a variable
     //x: String
@@ -227,7 +239,7 @@ class TommyParser : Grammar<List<AST>>() {
     //A statement is either return or a typed variable declaration or an untyped variable declaration or a function or reassigning a variable or an if
     //return (a * b)
     private val statement : Parser<Statement> = returnParser or varDefParser or untypedVarDefParser or funDefParser or
-            varReassignParser or ifParser or whileParser or arrayGetParser or arraySetParser
+            varReassignParser or ifParser or whileParser or arraySetParser
 
             //An ast is an expression or a statement
     private val astParser = statement or expr //order matters here for assignment!

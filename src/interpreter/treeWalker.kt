@@ -34,6 +34,7 @@ fun runbody(body: List<AST>, environment: MutableMap<String, Tuple2<String?, Any
                     is LInt -> return curr.value
                     is LString -> return curr.value
                     is LBool -> return curr.value
+                    is LArray ->  return curr.values
                 }
             }
             is Expression -> {
@@ -76,7 +77,8 @@ fun runbody(body: List<AST>, environment: MutableMap<String, Tuple2<String?, Any
                        }
                    }
                    is Prefix -> {
-                       when(curr.op.type.cod) {
+                       //TODO this is garbage
+                       when(curr.op.type.dom[0]) {
                            is TBool -> {
                               //this is a boolean thing, only operator is NOT
                               when (curr.op) {
@@ -179,6 +181,15 @@ fun runbody(body: List<AST>, environment: MutableMap<String, Tuple2<String?, Any
                                    }
                                    InOp.neq -> {
                                        return left != right
+                                   }
+                               }
+                           }
+                           is TString -> {
+                               val left = left.toString()
+                               val right = right.toString()
+                               when(curr.op) {
+                                   InOp.concat -> {
+                                       return left + right
                                    }
                                }
                            }
