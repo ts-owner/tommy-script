@@ -112,7 +112,7 @@ class TommyParser : Grammar<List<AST>>() {
 
     //PLUS AND MINUS (+ and -)
     val lvTenOperatorChain: Parser<Expr> = leftAssociative(lvElevenOperatorChain, (PLUS or MINUS)) { l, o, r ->
-        Infix(if (o.type == PLUS) InOp.plus else InOp.negate, l, r)
+        Infix(if (o.type == PLUS) InOp.plus else InOp.subtract, l, r)
     }
 
     //Defining characters as their actual functions (the characters being == and != and <= and >= and < and > )
@@ -180,7 +180,7 @@ class TommyParser : Grammar<List<AST>>() {
     //let multiply (a: Int, b: Int):Int =
         //return (a * b)
         //end
-    //let printWord (a: String):Unit =
+    //let printWord (a: String) =
         //print (a)
         //end
     private val funDefParser = -LET and idParser and
