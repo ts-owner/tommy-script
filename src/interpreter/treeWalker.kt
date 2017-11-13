@@ -73,7 +73,7 @@ fun runbody(body: List<AST>, environment: MutableMap<String, Tuple2<String?, Any
                                    //if (matchArgs(ffun.t1, curr.args))
                                    if(storedFunction.t1.size == curr.args.size) {
                                        //set arguments in environment
-                                       var new_environment = environment.toMap() as MutableMap
+                                       var new_environment = environment.toMutableMap()
                                        //TODO not sure if ANYTHING from new environment persist ever
                                        storedFunction.t1.zip(curr.args) { a : AnnotatedVar, b: Expr ->
                                            val ret = rec(b,environment)
