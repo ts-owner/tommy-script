@@ -1,0 +1,36 @@
+let multiply(a: Int, b: Int):Int =
+    return (-a * b)
+end
+
+let numOfRecursions = 0
+let fullValue = 0
+
+let ackermannFunc(a: Int, b: Int):Int =
+    print(a)
+    print(b)
+    let calc = 0
+    let calc2 = 0
+
+    if (a == 0) then
+        n = n + 1
+
+        return n
+    end
+
+    if(a > 0 and b == 0) then
+        a = a - 1
+        calc2 = ackermannFunc(a, b)
+        fullValue = calc2 + fullValue
+        return fullValue
+    end
+
+    if (a > 0 and b > 0) then
+        a = a - 1
+        calc = ackermannFunc(a + 1, b - 1)
+        calc2 = ackermannFunc(a, calc)
+        fullValue = calc2 + fullValue
+        return calc2
+    end
+end
+
+print(ackermannFunc(2,2))
