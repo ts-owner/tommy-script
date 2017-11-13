@@ -57,7 +57,8 @@ fun runbody(body: List<AST>, environment: MutableMap<String, Tuple2<String?, Any
                    is FunCall -> {
                        //TODO put std lib in other file
                        //std lib
-                       if(curr.id=="print") println(rec(curr.args.first(),environment))
+                       if(curr.id=="println") println(rec(curr.args.first(),environment))
+                       if(curr.id=="print") print(rec(curr.args.first(),environment))
                        //the worst line of code ever written
                        if(curr.id=="len") return (environment[(curr.args.first() as Var).id]!!.t2 as MutableList<*>).size
 
@@ -72,7 +73,7 @@ fun runbody(body: List<AST>, environment: MutableMap<String, Tuple2<String?, Any
                                    //if (matchArgs(ffun.t1, curr.args))
                                    if(storedFunction.t1.size == curr.args.size) {
                                        //set arguments in environment
-                                       var new_environment = environment.toMap() as MutableMap
+                                       var new_environment = environment.toMutableMap()
                                        //TODO not sure if ANYTHING from new environment persist ever
                                        storedFunction.t1.zip(curr.args) { a : AnnotatedVar, b: Expr ->
                                            val ret = rec(b,environment)
@@ -201,8 +202,14 @@ fun runbody(body: List<AST>, environment: MutableMap<String, Tuple2<String?, Any
                                }
                            }
                            is TString -> {
+                               left.toString()
+                               if(left is MutableList<*> && right is MutableList<*>) {
+                                   left as MutableList<Any>
+                                   right as MutableList<Any>
+                                   left.addAll(right)
+                                   return left
+                               }
                                if (left is MutableList<*>) {
-                                   println("asdads")
                                    left as MutableList<Any>
                                    left.add(right)
                                    return left
@@ -281,6 +288,15 @@ fun runbody(body: List<AST>, environment: MutableMap<String, Tuple2<String?, Any
                         while(rec(curr.cond,environment) as Boolean) {
                             var ret = runbody(curr.body, environment)
                             if (ret is ReturnBox) return ret.content
+                        }
+                    }
+                    is For -> {
+                        val (id, listExpr, body) = curr
+                        val list = rec(listExpr, environment) as MutableList<Any>
+                        for(x in list) {
+                            environment[id] = Tuple2(null as String?, x)
+                            runbody(body, environment)
+                            environment.remove(id)
                         }
                     }
                 //TODO while, closures

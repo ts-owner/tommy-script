@@ -33,4 +33,4 @@ let ackermannFunc(a: Int, b: Int):Int =
     end
 end
 
-print(ackermannFunc(1,1))
+print(ackermannFunc(2,2))

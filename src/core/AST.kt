@@ -79,3 +79,4 @@ data class FunDef(val id : String, val args : List<AnnotatedVar>, val returnType
                   val statements : Body) : Statement()
 data class Return(val toReturn : Expr) : Statement()
 data class While(val cond : Expr, val body : Body): Statement()
+data class For(val elemIdent : String, val list : Expr, val body : Body): Statement()
