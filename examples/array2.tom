@@ -1,19 +1,26 @@
-let test = [true,3]
-let test1 = [5,6]
-println(test ++ test1 ++ 5)
-test = test ++ 4
-let array = test ++ test1 ++ 4
-
-let arrayOfSize(n : Int):[Int]=
-    println(n)
-end
-
-let printArr(arr : [Int]):Unit=
-    let x = 0
-    while (x<len(test)-1) do
-        x = x+1
-        println(test[x])
+let printArr(arr : [Int]) : Unit =
+    print("[")
+    if len(arr) == 0 then
+        println("]")
+    else
+        let flag = true
+        for x in arr do
+            if flag then
+                print(x)
+                flag = false
+            else
+                print(", ")
+                print(x)
+            end
+        end
+        println("]")
     end
 end
+
+let test = [true,3]
+let test1 = [5,6]
+printArr(test ++ test1 ++ 5)
+test = test ++ 4
+let array = test ++ test1 ++ 4
 
 printArr(test)

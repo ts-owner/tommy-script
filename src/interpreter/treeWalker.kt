@@ -290,6 +290,15 @@ fun runbody(body: List<AST>, environment: MutableMap<String, Tuple2<String?, Any
                             if (ret is ReturnBox) return ret.content
                         }
                     }
+                    is For -> {
+                        val (id, listExpr, body) = curr
+                        val list = rec(listExpr, environment) as MutableList<Any>
+                        for(x in list) {
+                            environment[id] = Tuple2(null as String?, x)
+                            runbody(body, environment)
+                            environment.remove(id)
+                        }
+                    }
                 //TODO while, closures
                 }
             }
