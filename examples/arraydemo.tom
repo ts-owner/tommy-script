@@ -1,13 +1,13 @@
 let test = [true,3,0,0,0,0,0,0,0,0,0,0,0,0]
 test[3] = "asdasd"
-print(test[3])
+println(test[3])
 let x = 0
 while (x<10) do
     x = x+1
     test[x] = "index " ++ x
     if(x%2 == 0) then
-        print(x)
+        println(x)
     else
-        print(test[x])
+        println(test[x])
     end
 end
