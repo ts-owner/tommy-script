@@ -4,7 +4,7 @@ println(test[3])
 let x = 0
 while (x<10) do
     x = x+1
-    test[x] = "index " ++ x
+    test[x] = "index " ++ str(x)
     if(x%2 == 0) then
         println(x)
     else
