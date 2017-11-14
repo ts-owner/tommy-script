@@ -1,4 +1,4 @@
-things to do still
+## things to do still
 
 
 	1.	loop grammar - Finished
@@ -15,7 +15,8 @@ things to do still
     
     	7.  	if expressions - done
 
-tree-walk interpretr specific things
+## tree-walk interpretr specific things
+
 	1.	refactor recursive function into two functions. one that takes expr->literal, one that takes statement->Unit
 	
 	2.	get rid of tuples and use data classes
