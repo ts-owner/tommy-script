@@ -22,7 +22,7 @@ fun runbody(body: List<AST>, environment: MutableMap<String, Tuple2<String?, Any
 //TODO properly use typeError, handle double/int properly
 //
  fun rec(curr: AST, environment: MutableMap<String, Tuple2<String?, Any>>):Any {
-        fun typeError(expr: Expr, what: String) {
+        fun typeError(expr: Expr, what: String) : Nothing {
             throw TypeCheckingException(wrongExpr = expr, msg=what)
         }
         fun nameError(what: String) {
@@ -59,6 +59,7 @@ fun runbody(body: List<AST>, environment: MutableMap<String, Tuple2<String?, Any
                        //std lib
                        if(curr.id=="println") println(rec(curr.args.first(),environment))
                        if(curr.id=="print") print(rec(curr.args.first(),environment))
+                       if(curr.id=="str") return rec(curr.args.first(), environment).toString()
                        //the worst line of code ever written
                        if(curr.id=="len") return (environment[(curr.args.first() as Var).id]!!.t2 as MutableList<*>).size
 
@@ -228,29 +229,16 @@ fun runbody(body: List<AST>, environment: MutableMap<String, Tuple2<String?, Any
                         environment[curr.lhs.id] = Tuple2("placeholder" as String?, array as Any)
 
                     }
-                    is If -> {
-                        //make sure it is boolean, maybe
-                        val result = rec(curr.cond, environment)
-                        if (result is Boolean) {
-                            var trueyet = false
-                            if (result) {
-                                //TODO handle environment properly
-                                return runbody(curr.thenBranch, environment)
-                            }
-                            if (curr.elifs != null) {
-                                curr.elifs.forEach { (a, b) ->
-                                    var res = rec(a, environment)
-                                    if (res is Boolean) {
-                                        if (res) {
-                                            return runbody(b, environment)
-                                        }
-                                    } else typeError(a, "should be bool")
-                                }
-                            }
-                            if (curr.elseBranch != null) {
-                                return runbody(curr.elseBranch, environment)
-                            }
-                        } else typeError(curr.cond, "should be bool")
+                    is IfStep -> {
+                        val result = rec(curr.cond, environment) as? Boolean ?: typeError(curr.cond, "should be bool")
+                        if(result) {
+                            return runbody(curr.body, environment)
+                        } else {
+                            curr.next?.let { nextIf -> rec(nextIf, environment) }
+                        }
+                    }
+                    is Else -> {
+                        return runbody(curr.body, environment)
                     }
                     is VarDef -> {
                         //TODO make it so you cant over-define things.

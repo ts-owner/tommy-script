@@ -62,14 +62,16 @@ sealed class Literal(val ty : Type) : Expr()
 data class LInt(val value: Int) : Literal(TInt)
 data class LString(val value: String) : Literal(TString)
 data class LBool(val value: Boolean) : Literal(TBool)
-data class LArray(val value: MutableList<Literal>): Literal(TArray)
+data class LArray(val value: MutableList<Expr>): Literal(TArray)
 object LUnit : Literal(TUnit) { override fun toString() = "unit" }
 
 sealed class Statement : AST()
 typealias Body = List<AST> //potentially temporary change to make parser work
 
 // Statements
-data class If(val cond : Expr, val thenBranch : Body, val elseBranch : Body? = null, val elifs : List<Tuple2<Expr, Body>>? = null) : Statement()
+sealed class If : Statement()
+data class IfStep(val cond : Expr, val body : Body, val next : If? = null) : If()
+data class Else(val body : Body) : If()
 data class VarDef(val lhs : AnnotatedVar, val rhs : Expr) : Statement()
 data class UntypedVarDef(val lhs : Var, val rhs : Expr) : Statement() //TODO @Brendan this is ugly maybe there's a cleaner way
 data class VarReassign(val lhs : Var, val rhs: Expr) : Statement()

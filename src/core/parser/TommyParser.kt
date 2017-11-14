@@ -80,13 +80,9 @@ class TommyParser : Grammar<List<AST>>() {
                                      .join().map(::LString)
 
     private val numParser = NUM use { LInt(text.toInt()) } //Parses numbers into LInts
-    private val trueParser = TRUE.asJust(LBool(true)) //Parses "true" into a boolean (LBool) `true`
-    private val falseParser = FALSE.asJust(LBool(false)) //Parses "false" into a boolean (LBool) `false`
+    private val boolParser = TRUE.asJust(LBool(true)) or FALSE.asJust(LBool(false))
     //TODO make this expr eventually
-
-    private val preLiteral = stringParser or numParser or trueParser or falseParser
-    private val literalParser = preLiteral
-
+    
     //Any amount of non-white-space followed by a ( and any number of parameters (`acceptZero = true` means it can be no parameters) and a )
     //Maps the parameters (`args`) and function name (`name.text`) to a function call
     private val funCallParser = id and -LPAR and
@@ -96,9 +92,11 @@ class TommyParser : Grammar<List<AST>>() {
     //Maps any non-white-space to a variable
     private val varParser = idParser.map(::Var)
 
-    private val arrayLiteralParser = -LBRA and separatedTerms(parser(this::preLiteral), COMMA, acceptZero = true) and -RBRA map { LArray(it.toMutableList()) }
+    private val arrayLiteralParser = -LBRA and separatedTerms(parser(this::expr), COMMA, acceptZero = true) and -RBRA map { LArray(it.toMutableList()) }
 
     private val arrayGetParser :Parser<Expr> = varParser and -LBRA and parser(this::expr) and -RBRA map { (name, index) -> ArrayAccess(name, index) }
+
+    val literalParser = stringParser or numParser or boolParser or arrayLiteralParser
 
     //switch out preexper thing with parser(this::expr) later, if it works with preexpr
     private val preexpr = literalParser or funCallParser or arrayGetParser or varParser or arrayLiteralParser or
@@ -240,10 +238,16 @@ class TommyParser : Grammar<List<AST>>() {
     //else
         //return "no"
     //end
-    val ifParser = -IF and expr and -THEN and zeroOrMore(parser(this::astParser)) and
-             zeroOrMore(-ELSEIF and expr and -THEN and zeroOrMore(parser(this::astParser))) and optional(-ELSE and zeroOrMore(parser(this::astParser))) and -END map { (cond, body, elifs, elsebody) ->
-        If(cond, body, elsebody, elifs)
-    }
+    private val elseifParser = -ELSEIF and expr and -THEN and zeroOrMore(parser(this::astParser))
+    private val ifParser = -IF and expr and -THEN and zeroOrMore(parser(this::astParser)) and
+             zeroOrMore(elseifParser) and optional(-ELSE and zeroOrMore(parser(this::astParser))) and
+            -END map { (cond, body, elifs, elsebody) ->
+                val elseBranch : If? = elsebody?.let { Else(it) }
+                val elseIfs = elifs.foldRight(elseBranch) { (currCond, currBody), next ->
+                    IfStep(currCond, currBody, next)
+                }
+                IfStep(cond, body, elseIfs)
+            }
 
     //A statement is either return or a typed variable declaration or an untyped variable declaration or a function or reassigning a variable or an if
     //return (a * b)

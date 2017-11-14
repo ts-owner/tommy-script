@@ -32,7 +32,7 @@ fun main(args: Array<String>) {
     println()
 }
 
-fun astHandler(debug : Boolean, prog : List<AST>) {
+fun execByPy(debug : Boolean, prog : List<AST>) {
     val progStr = prog.map { compile(it) }.joinToString("\n")
     val fileName = "tommygen${UUID.randomUUID().toString().replace("-", "")}.py"
     val pyFile = File(fileName)
@@ -56,5 +56,5 @@ fun runFile(path : String) {
 
     var parseResult = TommyParser().parseToEnd(script.inputStream())
 
-    astHandler(false, parseResult)
+    walkTree(false, parseResult)
 }
