@@ -101,11 +101,11 @@ fun runbody(body: List<AST>, environment: MutableMap<String, Tuple2<String?, Any
                               when (curr.op) {
                                   PreOp.not -> {
                                       //if curr is boolean
-                                      val exp = rec(curr.expr, environment)
+                                      val exp = rec(curr.arg, environment)
                                       if (exp is Boolean) {
                                           return  !exp
                                       } else {
-                                          typeError(curr.expr, "should be bool")
+                                          typeError(curr.arg, "should be bool")
                                       }
                                   }
                               }
@@ -115,11 +115,11 @@ fun runbody(body: List<AST>, environment: MutableMap<String, Tuple2<String?, Any
                                when(curr.op) {
                                    PreOp.negate -> {
                                        //make sure this is number
-                                       val exp = rec(curr.expr, environment)
+                                       val exp = rec(curr.arg, environment)
                                        if (exp is Int) return -exp
                                        if (exp is Double) return -exp
                                    }
-                                   PreOp.plus -> rec(curr.expr, environment)
+                                   PreOp.plus -> rec(curr.arg, environment)
                                }
                            }
                            is TString -> {
@@ -166,7 +166,7 @@ fun runbody(body: List<AST>, environment: MutableMap<String, Tuple2<String?, Any
                                    InOp.plus ->{
                                        return left + right
                                    }
-                                   InOp.negate -> { //FLAGGED, ASK ABOUT THIS
+                                   InOp.subtract -> {
                                        return left - right
                                    }
                                    InOp.mod -> {
@@ -180,15 +180,7 @@ fun runbody(body: List<AST>, environment: MutableMap<String, Tuple2<String?, Any
                                        return left/right
                                    }
                                    InOp.power -> { //TODO deal with double/int
-                                       var power: Int = right
-                                       var result = 1
-
-                                       while(power > 0) {
-                                           result *= left
-                                           power -= 1
-                                       }
-
-                                       return pow( left as Double, right as Double)
+                                       return pow(left as Double, right as Double)
                                    }
                                    InOp.leq -> {
                                        return left <= right

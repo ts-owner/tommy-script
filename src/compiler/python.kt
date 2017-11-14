@@ -14,6 +14,7 @@ fun InOp.toPython() = when(this) {
     InOp.subtract -> "-"
     InOp.times -> "*"
     InOp.div -> "/"
+    InOp.mod -> "%"
     InOp.power -> "**"
     InOp.concat -> "+"
     InOp.and -> "and"
@@ -46,6 +47,9 @@ private fun compile(expr : Expr) : String = when(expr) {
     is LInt -> "${expr.value}"
     is LString -> "\"${expr.value.escaped()}\""
     is LBool -> if(expr.value) "True" else "False"
+    is LUnit -> "None"
+    is LArray -> "[${expr.value.joinToString(transform = ::compile)}]"
+    is ArrayAccess -> "${expr.name.id}[${compile(expr.index)}]"
 }
 
 private val indentStr = "    "
@@ -67,11 +71,21 @@ private fun compile(ast : AST, indent : String) : String = when(ast) {
             is VarDef -> "$indent${stmt.lhs.id} = ${compile(stmt.rhs)}"
             is UntypedVarDef -> "$indent${stmt.lhs.id} = ${compile(stmt.rhs)}"
             is VarReassign -> "$indent${stmt.lhs.id} = ${compile(stmt.rhs)}"
+            is ArrayAssignment -> "$indent${stmt.lhs.id}[${compile(stmt.index)}] = ${compile(stmt.rhs)}"
             is FunDef -> {
                 val (id, args, _, statements) = stmt
                 val argStr = args.joinToString(transform = AnnotatedVar::id)
                 val bodyStr = statements.joinBody()
                 "${indent}def $id($argStr):\n$bodyStr$end"
+            }
+            is While -> {
+                val bodyStr = stmt.body.joinBody()
+                "${indent}while ${compile(stmt.cond)}:\n$bodyStr$end"
+            }
+            is For -> {
+                val (id, list, body) = stmt
+                val bodyStr = body.joinBody()
+                "${indent}for $id in ${compile(list)}:\n$bodyStr$end"
             }
             is Return -> "$indent${compile(stmt.toReturn)}"
         }
