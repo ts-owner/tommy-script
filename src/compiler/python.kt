@@ -113,7 +113,7 @@ private fun compile(ast : AST, indent : String) : String = when(ast) {
 fun compile(ast : AST) = compile(ast, "")
 
 fun execByPy(prog : List<AST>) {
-    val progStr = prog.map { compile(it) }.joinToString("\n")
+    val progStr = prog.joinToString(separator = "\n", transform = ::compile)
     val fileName = "tommygen${UUID.randomUUID().toString().replace("-", "")}.py"
     val pyFile = File(fileName)
     pyFile.writeText(stdLib.joinToString("\n", transform = ::compile))

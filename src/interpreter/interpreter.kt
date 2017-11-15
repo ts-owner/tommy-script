@@ -36,8 +36,6 @@ fun InOp.eval(lhs : Value, rhs : Value) : Value {
     }
 }
 
-fun <K, V> MutableMap<K, V>.copy() = this.toMutableMap()
-
 fun retPass(function : TommyFunc) : TommyFunc {
     val (id, _, _, body, _) = function
     val retVar = Var("$id+")

@@ -1,17 +1,8 @@
 package interpreter
 
 import com.github.h0tk3y.betterParse.grammar.parseToEnd
-import compiler.compile
-import core.*
 import core.parser.TommyParser
-import standard_library.stdLib
 import java.io.File
-import java.io.FileNotFoundException
-import java.io.PrintStream
-import java.util.*
-import java.util.concurrent.TimeUnit
-import kotlin.test.assertEquals
-import kotlin.test.assertFails
 
 fun main(args: Array<String>) {
     println("------ ACKERMANN ------")
@@ -36,11 +27,6 @@ fun main(args: Array<String>) {
 
 fun runFile(path : String) {
     val script = File(path)
-    val lines = try {
-        script.readLines()
-    } catch (e: FileNotFoundException) {
-        throw IllegalArgumentException("${script.absolutePath}: No such file or directory")
-    }
 
     val parseResult = TommyParser().parseToEnd(script.inputStream())
 

@@ -4,7 +4,7 @@ import com.github.h0tk3y.betterParse.combinators.asJust
 import com.github.h0tk3y.betterParse.lexer.TokenMatch
 import com.github.h0tk3y.betterParse.parser.*
 
-internal class BindCombinator<T, R>(
+internal class BindCombinator<T, out R>(
         val innerParser: Parser<T>,
         val transform: (T) -> Parser<R>
 ) : Parser<R> {

@@ -1,7 +1,6 @@
 package interpreter
 
 import com.github.h0tk3y.betterParse.grammar.parseToEnd
-import com.github.h0tk3y.betterParse.parser.ParseResult
 import core.parser.TommyParser
 import java.io.File
 import kotlin.test.assertEquals
@@ -11,31 +10,28 @@ import java.io.FileNotFoundException
 
 fun main(args: Array<String>) {
     //test the AST
-    var testExpression = Infix(InOp.plus, LInt(1), Prefix(PreOp.negate, Var("a")))
+    val testExpression = Infix(InOp.plus, LInt(1), Prefix(PreOp.negate, Var("a")))
     assertEquals(TInt, typeInfer(mapOf("a" to TInt), testExpression))
     assertFails { typeInfer(mapOf("a" to TBool), testExpression) }
 
-    var exampleScript:File?
-    var lines:List<String>?
-
     //read file from args
-    try {
-        exampleScript = File(args.last())
+    val exampleScript = try {
+        File(args.last())
     } catch (e: NoSuchElementException) {
         throw IllegalArgumentException("No path was given")
     }
 
-    try {
-        lines = exampleScript.readLines()
+    val lines = try {
+        exampleScript.readLines()
     } catch (e: FileNotFoundException) {
         throw IllegalArgumentException("${args.first()}: No such file or directory")
     }
 
-    var debug = args.contains("-d")
+    val debug = args.contains("-d")
 
     if (debug) println(lines)
 
-    var parseResult = TommyParser().parseToEnd(exampleScript.inputStream())
+    val parseResult = TommyParser().parseToEnd(exampleScript.inputStream())
 
     interpretProgram(parseResult)
 }

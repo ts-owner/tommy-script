@@ -97,7 +97,7 @@ class TommyParser : Grammar<List<AST>>() {
 
     private val arrayGetParser = varParser and -LBRA and parser(this::expr) and -RBRA map { (name, index) -> ArrayAccess(name, index) }
 
-    val literalParser = stringParser or numParser or boolParser or unitParser or arrayLiteralParser
+    private val literalParser = stringParser or numParser or boolParser or unitParser or arrayLiteralParser
 
     //switch out preexper thing with parser(this::expr) later, if it works with preexpr
     private val preexpr = literalParser or funCallParser or arrayGetParser or varParser or arrayLiteralParser or
@@ -162,17 +162,17 @@ class TommyParser : Grammar<List<AST>>() {
     //give alternative path around prefix operator
     //AND
     val lvFiveOperatorChain: Parser<Expr> = leftAssociative(lvSixOperatorChain or lvNineOperatorChain, AND) { l, _, r ->
-        Infix(InOp.and, l, r);
+        Infix(InOp.and, l, r)
     }
 
     //OR
     val lvFourOperatorChain: Parser<Expr> = leftAssociative(lvFiveOperatorChain, OR) { l, _, r ->
-        Infix(InOp.or, l, r);
+        Infix(InOp.or, l, r)
     }
 
     //CONCAT
     val lvThreeOperatorChain: Parser<Expr> = leftAssociative(lvFourOperatorChain, CONCAT) { l, _, r ->
-        Infix(InOp.concat, l, r);
+        Infix(InOp.concat, l, r)
     }
 
 
