@@ -51,6 +51,7 @@ class TommyParser : Grammar<List<AST>>() {
     private val STRING by token("\".*\"")
     private val TRUE by token("true")
     private val FALSE by token("false")
+    private val UNIT by token("unit")
 
     //types
     private val stringSymbol by token("String")
@@ -81,22 +82,22 @@ class TommyParser : Grammar<List<AST>>() {
 
     private val numParser = NUM use { LInt(text.toInt()) } //Parses numbers into LInts
     private val boolParser = TRUE.asJust(LBool(true)) or FALSE.asJust(LBool(false))
-    //TODO make this expr eventually
+    private val unitParser = UNIT.asJust(LUnit)
     
     //Any amount of non-white-space followed by a ( and any number of parameters (`acceptZero = true` means it can be no parameters) and a )
     //Maps the parameters (`args`) and function name (`name.text`) to a function call
     private val funCallParser = id and -LPAR and
                                 separatedTerms(parser(this::expr), COMMA, acceptZero = true) and
-                                -RPAR map { (name, args) -> FunCall(name.text, args) }
+                                -RPAR map { (name, args) -> FunCall(Var(name.text), args) }
 
     //Maps any non-white-space to a variable
     private val varParser = idParser.map(::Var)
 
     private val arrayLiteralParser = -LBRA and separatedTerms(parser(this::expr), COMMA, acceptZero = true) and -RBRA map { LArray(it.toMutableList()) }
 
-    private val arrayGetParser :Parser<Expr> = varParser and -LBRA and parser(this::expr) and -RBRA map { (name, index) -> ArrayAccess(name, index) }
+    private val arrayGetParser = varParser and -LBRA and parser(this::expr) and -RBRA map { (name, index) -> ArrayAccess(name, index) }
 
-    val literalParser = stringParser or numParser or boolParser or arrayLiteralParser
+    val literalParser = stringParser or numParser or boolParser or unitParser or arrayLiteralParser
 
     //switch out preexper thing with parser(this::expr) later, if it works with preexpr
     private val preexpr = literalParser or funCallParser or arrayGetParser or varParser or arrayLiteralParser or
@@ -108,7 +109,7 @@ class TommyParser : Grammar<List<AST>>() {
                                            -END map{(cond, statement) -> While(cond, statement)}
     private val forParser = -FOR and idParser and -IN and parser(this::expr) and
             -DO and zeroOrMore(parser(this::astParser)) and
-            -END map{(elem, list, body) -> For(elem, list, body)}
+            -END map{(elem, list, body) -> For(Var(elem), list, body)}
 
     //operators zone
     //The operators with the highest number in the operator chain happen first. Eg: power function > plus/minus
@@ -225,7 +226,7 @@ class TommyParser : Grammar<List<AST>>() {
             -COLON and typeParser and -EQUALS and
             zeroOrMore(parser(this::astParser)) and
             -END map { (funName, args, retType, children) ->
-        FunDef(funName, args, retType, children)
+        FunDef(Var(funName), args, retType, children)
     }
 
     //Returns something

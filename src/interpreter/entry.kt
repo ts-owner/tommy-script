@@ -37,9 +37,7 @@ fun main(args: Array<String>) {
 
     var parseResult = TommyParser().parseToEnd(exampleScript.inputStream())
 
-    walkTree(debug, parseResult)
-
-
+    interpretProgram(parseResult)
 }
 //TODO all the dangling operators (from python reference, array access, etc)
 // (look through example, make test case)
