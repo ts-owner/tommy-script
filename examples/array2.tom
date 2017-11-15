@@ -19,8 +19,8 @@ end
 
 let test = [true,3]
 let test1 = [5,6]
-printArr(test ++ test1 ++ 5)
-test = test ++ 4
-let array = test ++ test1 ++ 4
+printArr(test ++ test1 ++ [5])
+test = test ++ [4]
+let array = test ++ test1 ++ [4]
 
 printArr(test)
