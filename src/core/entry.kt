@@ -1,11 +1,11 @@
-package interpreter
+package core
 
 import com.github.h0tk3y.betterParse.grammar.parseToEnd
 import core.parser.TommyParser
 import java.io.File
 import kotlin.test.assertEquals
 import kotlin.test.assertFails
-import core.*
+import interpreter.interpretProgram
 import java.io.FileNotFoundException
 
 fun main(args: Array<String>) {

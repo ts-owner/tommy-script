@@ -1,7 +1,8 @@
-package interpreter
+package core
 
 import com.github.h0tk3y.betterParse.grammar.parseToEnd
 import core.parser.TommyParser
+import interpreter.interpretProgram
 import java.io.File
 
 fun main(args: Array<String>) {
