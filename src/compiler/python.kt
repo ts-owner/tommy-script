@@ -66,53 +66,50 @@ private fun compile(expr : Expr) : String = when(expr) {
 
 private val indentStr = "    "
 
-private fun compile(ast : AST, indent : String) : String = when(ast) {
-    is Expr -> indent + compile(ast)
-    is Statement -> {
-        val stmt : Statement = ast
-        val newIndent = "$indent$indentStr"
-        val end = "\n${newIndent}pass"
-        fun List<AST>.joinBody() = joinToString("\n") { compile(it, newIndent) }
-        when(stmt) {
-            is IfStep -> {
-                val (cond, body, next) = stmt
-                val thenStr = body.joinBody()
-                val elseStr = when(next) {
-                    is IfStep -> compile(next, indent).replaceFirst("if", "elif")
-                    is Else -> compile(next, indent)
-                    null -> ""
-                }
-                "${indent}if ${compile(cond)}:\n$thenStr$end\n$elseStr"
+private fun compile(stmt : Stmt, indent : String) : String {
+    val newIndent = "$indent$indentStr"
+    val end = "\n${newIndent}pass"
+    fun Body.joinBody() = joinToString("\n") { compile(it, newIndent) }
+    return when(stmt) {
+        is EvalExpr -> indent + compile(stmt.expr)
+        is IfStep -> {
+            val (cond, body, next) = stmt
+            val thenStr = body.joinBody()
+            val elseStr = when(next) {
+                is IfStep -> compile(next, indent).replaceFirst("if", "elif")
+                is Else -> compile(next, indent)
+                null -> ""
             }
-            // TODO: Make sure we can't transpile a standalone else
-            is Else -> "${indent}else:\n${stmt.body.joinBody()}$end"
-            is VarDef -> "$indent${stmt.lhs.id} = ${compile(stmt.rhs)}"
-            is UntypedVarDef -> "$indent${stmt.lhs.id} = ${compile(stmt.rhs)}"
-            is VarReassign -> "$indent${stmt.lhs.id} = ${compile(stmt.rhs)}"
-            is ArrayAssignment -> "$indent${stmt.lhs.id}[${compile(stmt.index)}] = ${compile(stmt.rhs)}"
-            is FunDef -> {
-                val (id, args, _, statements) = stmt
-                val argStr = args.joinToString(transform = AnnotatedVar::id)
-                val bodyStr = statements.joinBody()
-                "${indent}def ${id.id}($argStr):\n$bodyStr$end"
-            }
-            is While -> {
-                val bodyStr = stmt.body.joinBody()
-                "${indent}while ${compile(stmt.cond)}:\n$bodyStr$end"
-            }
-            is For -> {
-                val (id, list, body) = stmt
-                val bodyStr = body.joinBody()
-                "${indent}for ${id.id} in ${compile(list)}:\n$bodyStr$end"
-            }
-            is Return -> "${indent}return ${compile(stmt.toReturn)}"
+            "${indent}if ${compile(cond)}:\n$thenStr$end\n$elseStr"
         }
+        // TODO: Make sure we can't transpile a standalone else
+        is Else -> "${indent}else:\n${stmt.body.joinBody()}$end"
+        is VarDef -> "$indent${stmt.lhs.id} = ${compile(stmt.rhs)}"
+        is UntypedVarDef -> "$indent${stmt.lhs.id} = ${compile(stmt.rhs)}"
+        is VarReassign -> "$indent${stmt.lhs.id} = ${compile(stmt.rhs)}"
+        is ArrayAssignment -> "$indent${stmt.lhs.id}[${compile(stmt.index)}] = ${compile(stmt.rhs)}"
+        is FunDef -> {
+            val (id, args, _, statements) = stmt
+            val argStr = args.joinToString(transform = AnnotatedVar::id)
+            val bodyStr = statements.joinBody()
+            "${indent}def ${id.id}($argStr):\n$bodyStr$end"
+        }
+        is While -> {
+            val bodyStr = stmt.body.joinBody()
+            "${indent}while ${compile(stmt.cond)}:\n$bodyStr$end"
+        }
+        is For -> {
+            val (id, list, body) = stmt
+            val bodyStr = body.joinBody()
+            "${indent}for ${id.id} in ${compile(list)}:\n$bodyStr$end"
+        }
+        is Return -> "${indent}return ${compile(stmt.toReturn)}"
     }
 }
 
-fun compile(ast : AST) = compile(ast, "")
+fun compile(stmt : Stmt) = compile(stmt, "")
 
-fun execByPy(prog : List<AST>) {
+fun execByPy(prog : List<Stmt>) {
     val progStr = prog.joinToString(separator = "\n", transform = ::compile)
     val fileName = "tommygen${UUID.randomUUID().toString().replace("-", "")}.py"
     val pyFile = File(fileName)

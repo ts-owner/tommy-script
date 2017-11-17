@@ -5,8 +5,8 @@ import core.*
 // eventually this will be written in tommy script directly
 // but we need to use TAny and Brendan hasn't made the type system good
 
-private fun tprint(message : Expr) = FunCall(Var("print"), listOf(message))
-private fun tpush(arr : Expr, elem : Expr) = FunCall(Var("push"), listOf(arr, elem))
+private fun tprint(message : Expr) = EvalExpr(FunCall(Var("print"), listOf(message)))
+private fun tpush(arr : Expr, elem : Expr) = EvalExpr(FunCall(Var("push"), listOf(arr, elem)))
 
 private val defPrintln = FunDef(Var("println"), listOf(AnnotatedVar("message", TAny)), TUnit, listOf(
         tprint(Var("message")),

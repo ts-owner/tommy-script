@@ -7,7 +7,7 @@ import com.github.h0tk3y.betterParse.grammar.tryParseToEnd
 import com.github.h0tk3y.betterParse.parser.*
 import core.*
 
-class TommyParser : Grammar<List<AST>>() {
+class TommyParser : Grammar<List<Stmt>>() {
     //Symbols
     private val LPAR by token("\\(")
     private val RPAR by token("\\)")
@@ -105,10 +105,10 @@ class TommyParser : Grammar<List<AST>>() {
 
     //TODO move this somewhere else
     private val whileParser = -WHILE and parser(this::expr) and
-                                           -DO and zeroOrMore(parser(this::astParser)) and
+                                           -DO and zeroOrMore(parser(this::statement)) and
                                            -END map{(cond, statement) -> While(cond, statement)}
     private val forParser = -FOR and idParser and -IN and parser(this::expr) and
-            -DO and zeroOrMore(parser(this::astParser)) and
+            -DO and zeroOrMore(parser(this::statement)) and
             -END map{(elem, list, body) -> For(Var(elem), list, body)}
 
     //operators zone
@@ -224,7 +224,7 @@ class TommyParser : Grammar<List<AST>>() {
     private val funDefParser = -LET and idParser and
             -LPAR and separatedTerms(annotatedVarParser, COMMA, acceptZero = true) and -RPAR and
             -COLON and typeParser and -EQUALS and
-            zeroOrMore(parser(this::astParser)) and
+            zeroOrMore(parser(this::statement)) and
             -END map { (funName, args, retType, children) ->
         FunDef(Var(funName), args, retType, children)
     }
@@ -239,9 +239,9 @@ class TommyParser : Grammar<List<AST>>() {
     //else
         //return "no"
     //end
-    private val elseifParser = -ELSEIF and expr and -THEN and zeroOrMore(parser(this::astParser))
-    private val ifParser = -IF and expr and -THEN and zeroOrMore(parser(this::astParser)) and
-             zeroOrMore(elseifParser) and optional(-ELSE and zeroOrMore(parser(this::astParser))) and
+    private val elseifParser = -ELSEIF and expr and -THEN and zeroOrMore(parser(this::statement))
+    private val ifParser = -IF and expr and -THEN and zeroOrMore(parser(this::statement)) and
+             zeroOrMore(elseifParser) and optional(-ELSE and zeroOrMore(parser(this::statement))) and
             -END map { (cond, body, elifs, elsebody) ->
                 val elseBranch : If? = elsebody?.let { Else(it) }
                 val elseIfs = elifs.foldRight(elseBranch) { (currCond, currBody), next ->
@@ -250,13 +250,12 @@ class TommyParser : Grammar<List<AST>>() {
                 IfStep(cond, body, elseIfs)
             }
 
+    private val loneExprParser = expr.map(::EvalExpr)
+
     //A statement is either return or a typed variable declaration or an untyped variable declaration or a function or reassigning a variable or an if
     //return (a * b)
     private val statement : Parser<Statement> = returnParser or varDefParser or untypedVarDefParser or funDefParser or
-            varReassignParser or ifParser or whileParser or forParser or arraySetParser
+            varReassignParser or ifParser or whileParser or forParser or arraySetParser or loneExprParser
 
-            //An ast is an expression or a statement
-    private val astParser = statement or expr //order matters here for assignment!
-    //The root of the program is one or more asts (one or more expressions/statements)
-    override val rootParser = oneOrMore(astParser) //TODO make this correct
+    override val rootParser = oneOrMore(statement) //TODO make this correct
 }

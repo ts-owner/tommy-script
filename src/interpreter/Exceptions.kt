@@ -5,19 +5,19 @@ import core.*
 sealed class InterpreterException(msg : String = "", cause : Exception? = null)
     : RuntimeException(msg, cause)
 
-class TopLevelException(msg : String = "", cause : Exception? = null, val top : AST)
+class TopLevelException(msg : String = "", cause : Exception? = null, val top : Stmt)
     : InterpreterException(msg, cause) {
     override fun toString() = super.toString() + "\nOccurring in $top"
 }
 
-class InvalidPassException(msg : String = "", cause : Exception? = null, val wrongAST : AST, val pass : String)
+class InvalidPassException(msg : String = "", cause : Exception? = null, val wrongStmt : Stmt, val pass : String)
     : InterpreterException(msg, cause) {
-    override fun toString() = super.toString() + "\n$wrongAST didn't undergo $pass"
+    override fun toString() = super.toString() + "\n$wrongStmt didn't undergo $pass"
 }
 
-class UndefinedVariableException(msg : String = "", cause : Exception? = null, val wrongAST : AST, val wrongId : String)
+class UndefinedVariableException(msg : String = "", cause : Exception? = null, val wrongExpr : Expr, val wrongId : String)
     : InterpreterException(msg, cause) {
-    override fun toString() = super.toString() + "\n$wrongId not defined in $wrongAST"
+    override fun toString() = super.toString() + "\n$wrongId not defined in $wrongExpr"
 }
 
 class IncorrectTypeException(msg : String = "", cause : Exception? = null, val wrongVal : Value)

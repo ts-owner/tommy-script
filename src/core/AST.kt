@@ -57,9 +57,7 @@ enum class InOp(val asText : String, val type : TFunction, val precedence : Int)
 
 data class AnnotatedVar(val id : String, val ty : Type)
 
-sealed class AST
-
-sealed class Expression : AST()
+sealed class Expression
 typealias Expr = Expression
 
 data class Var(val id : String) : Expr()
@@ -80,20 +78,22 @@ data class LBool(val value : Boolean) : Literal(TBool)
 data class LArray(val value : List<Expr>) : Literal(TArray)
 object LUnit : Literal(TUnit)
 
-sealed class Statement : AST()
-typealias Body = List<AST> //potentially temporary change to make parser work
+sealed class Statement
+typealias Body = List<Statement>
+typealias Stmt = Statement
 
 // Statements
-sealed class If : Statement()
+data class EvalExpr(val expr : Expr) : Stmt()
 
+sealed class If : Stmt()
 data class IfStep(val cond : Expr, val body : Body, val next : If? = null) : If()
 data class Else(val body : Body) : If()
-data class VarDef(val lhs : AnnotatedVar, val rhs : Expr) : Statement()
-data class UntypedVarDef(val lhs : Var, val rhs : Expr) : Statement() //TODO @Brendan this is ugly maybe there's a cleaner way
-data class VarReassign(val lhs : Var, val rhs : Expr) : Statement()
-data class ArrayAssignment(val lhs : Var, val index : Expr, val rhs : Expr) : Statement()
-data class FunDef(val id : Var, val args : List<AnnotatedVar>, val returnType : Type,
-                  val statements : Body) : Statement()
-data class Return(val toReturn : Expr) : Statement()
-data class While(val cond : Expr, val body : Body) : Statement()
-data class For(val elemIdent : Var, val list : Expr, val body : Body) : Statement()
+
+data class VarDef(val lhs : AnnotatedVar, val rhs : Expr) : Stmt()
+data class UntypedVarDef(val lhs : Var, val rhs : Expr) : Stmt() //TODO @Brendan this is ugly maybe there's a cleaner way
+data class VarReassign(val lhs : Var, val rhs : Expr) : Stmt()
+data class ArrayAssignment(val lhs : Var, val index : Expr, val rhs : Expr) : Stmt()
+data class FunDef(val id : Var, val args : List<AnnotatedVar>, val returnType : Type, val statements : Body) : Stmt()
+data class Return(val toReturn : Expr) : Stmt()
+data class While(val cond : Expr, val body : Body) : Stmt()
+data class For(val elemIdent : Var, val list : Expr, val body : Body) : Stmt()
