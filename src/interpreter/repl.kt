@@ -1,33 +1,22 @@
 package interpreter
 
-import java.io.InputStreamReader
-import java.util.*
+import com.github.h0tk3y.betterParse.grammar.parseToEnd
+import core.parser.TommyParser
+import standard_library.stdLib
 
-const val prelude: String = "ts> ";
-const val quit: String = "--quit";
+const val prelude: String = "ts> "
+const val quit: String = "--quit"
 
-fun main(){
-    var input: Scanner = Scanner(System.`in`)
-
-    var eof = true
-    var line: String = ""
-    var depth: Int = 0
-    while (input.hasNext()){
-        line = input.nextLine()
-        // why no eof :(
-        if(line == quit){
-            break
-        } else if (line == "po") {
-            depth += 1
-            System.out.printf("    ".repeat(depth));
-        }
-        System.out.print(evaluate(line))
+fun main(args : Array<String>) {
+    val environment = mutableMapOf<String, Value>()
+    val functionDefs = mutableMapOf<String, Func>("print" to Print, "len" to Len, "str" to Str, "push" to Push)
+    stdLib.forEach { exec(it, environment, functionDefs) }
+    while(true) {
+        print(prelude)
+        val line = readLine()
+        if(line == null || line == quit) break
+        val prog = TommyParser().parseToEnd(line)[0]
+        interp(prog, environment, functionDefs)
+        println()
     }
-
 }
-
-fun evaluate(something:String): String {
-    var output:String = "hey"
-    return output
-}
-

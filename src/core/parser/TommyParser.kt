@@ -7,7 +7,7 @@ import com.github.h0tk3y.betterParse.grammar.tryParseToEnd
 import com.github.h0tk3y.betterParse.parser.*
 import core.*
 
-class TommyParser : Grammar<List<AST>>() {
+class TommyParser : Grammar<List<Stmt>>() {
     //Symbols
     private val LPAR by token("\\(")
     private val RPAR by token("\\)")
@@ -51,6 +51,7 @@ class TommyParser : Grammar<List<AST>>() {
     private val STRING by token("\".*\"")
     private val TRUE by token("true")
     private val FALSE by token("false")
+    private val UNIT by token("unit")
 
     //types
     private val stringSymbol by token("String")
@@ -81,22 +82,22 @@ class TommyParser : Grammar<List<AST>>() {
 
     private val numParser = NUM use { LInt(text.toInt()) } //Parses numbers into LInts
     private val boolParser = TRUE.asJust(LBool(true)) or FALSE.asJust(LBool(false))
-    //TODO make this expr eventually
+    private val unitParser = UNIT.asJust(LUnit)
     
     //Any amount of non-white-space followed by a ( and any number of parameters (`acceptZero = true` means it can be no parameters) and a )
     //Maps the parameters (`args`) and function name (`name.text`) to a function call
     private val funCallParser = id and -LPAR and
                                 separatedTerms(parser(this::expr), COMMA, acceptZero = true) and
-                                -RPAR map { (name, args) -> FunCall(name.text, args) }
+                                -RPAR map { (name, args) -> FunCall(Var(name.text), args) }
 
     //Maps any non-white-space to a variable
     private val varParser = idParser.map(::Var)
 
     private val arrayLiteralParser = -LBRA and separatedTerms(parser(this::expr), COMMA, acceptZero = true) and -RBRA map { LArray(it.toMutableList()) }
 
-    private val arrayGetParser :Parser<Expr> = varParser and -LBRA and parser(this::expr) and -RBRA map { (name, index) -> ArrayAccess(name, index) }
+    private val arrayGetParser = varParser and -LBRA and parser(this::expr) and -RBRA map { (name, index) -> ArrayAccess(name, index) }
 
-    val literalParser = stringParser or numParser or boolParser or arrayLiteralParser
+    private val literalParser = stringParser or numParser or boolParser or unitParser or arrayLiteralParser
 
     //switch out preexper thing with parser(this::expr) later, if it works with preexpr
     private val preexpr = literalParser or funCallParser or arrayGetParser or varParser or arrayLiteralParser or
@@ -104,11 +105,11 @@ class TommyParser : Grammar<List<AST>>() {
 
     //TODO move this somewhere else
     private val whileParser = -WHILE and parser(this::expr) and
-                                           -DO and zeroOrMore(parser(this::astParser)) and
+                                           -DO and zeroOrMore(parser(this::statement)) and
                                            -END map{(cond, statement) -> While(cond, statement)}
     private val forParser = -FOR and idParser and -IN and parser(this::expr) and
-            -DO and zeroOrMore(parser(this::astParser)) and
-            -END map{(elem, list, body) -> For(elem, list, body)}
+            -DO and zeroOrMore(parser(this::statement)) and
+            -END map{(elem, list, body) -> For(Var(elem), list, body)}
 
     //operators zone
     //The operators with the highest number in the operator chain happen first. Eg: power function > plus/minus
@@ -161,17 +162,17 @@ class TommyParser : Grammar<List<AST>>() {
     //give alternative path around prefix operator
     //AND
     val lvFiveOperatorChain: Parser<Expr> = leftAssociative(lvSixOperatorChain or lvNineOperatorChain, AND) { l, _, r ->
-        Infix(InOp.and, l, r);
+        Infix(InOp.and, l, r)
     }
 
     //OR
     val lvFourOperatorChain: Parser<Expr> = leftAssociative(lvFiveOperatorChain, OR) { l, _, r ->
-        Infix(InOp.or, l, r);
+        Infix(InOp.or, l, r)
     }
 
     //CONCAT
     val lvThreeOperatorChain: Parser<Expr> = leftAssociative(lvFourOperatorChain, CONCAT) { l, _, r ->
-        Infix(InOp.concat, l, r);
+        Infix(InOp.concat, l, r)
     }
 
 
@@ -223,9 +224,9 @@ class TommyParser : Grammar<List<AST>>() {
     private val funDefParser = -LET and idParser and
             -LPAR and separatedTerms(annotatedVarParser, COMMA, acceptZero = true) and -RPAR and
             -COLON and typeParser and -EQUALS and
-            zeroOrMore(parser(this::astParser)) and
+            zeroOrMore(parser(this::statement)) and
             -END map { (funName, args, retType, children) ->
-        FunDef(funName, args, retType, children)
+        FunDef(Var(funName), args, retType, children)
     }
 
     //Returns something
@@ -238,9 +239,9 @@ class TommyParser : Grammar<List<AST>>() {
     //else
         //return "no"
     //end
-    private val elseifParser = -ELSEIF and expr and -THEN and zeroOrMore(parser(this::astParser))
-    private val ifParser = -IF and expr and -THEN and zeroOrMore(parser(this::astParser)) and
-             zeroOrMore(elseifParser) and optional(-ELSE and zeroOrMore(parser(this::astParser))) and
+    private val elseifParser = -ELSEIF and expr and -THEN and zeroOrMore(parser(this::statement))
+    private val ifParser = -IF and expr and -THEN and zeroOrMore(parser(this::statement)) and
+             zeroOrMore(elseifParser) and optional(-ELSE and zeroOrMore(parser(this::statement))) and
             -END map { (cond, body, elifs, elsebody) ->
                 val elseBranch : If? = elsebody?.let { Else(it) }
                 val elseIfs = elifs.foldRight(elseBranch) { (currCond, currBody), next ->
@@ -249,13 +250,12 @@ class TommyParser : Grammar<List<AST>>() {
                 IfStep(cond, body, elseIfs)
             }
 
+    private val loneExprParser = expr.map(::EvalExpr)
+
     //A statement is either return or a typed variable declaration or an untyped variable declaration or a function or reassigning a variable or an if
     //return (a * b)
     private val statement : Parser<Statement> = returnParser or varDefParser or untypedVarDefParser or funDefParser or
-            varReassignParser or ifParser or whileParser or forParser or arraySetParser
+            varReassignParser or ifParser or whileParser or forParser or arraySetParser or loneExprParser
 
-            //An ast is an expression or a statement
-    private val astParser = statement or expr //order matters here for assignment!
-    //The root of the program is one or more asts (one or more expressions/statements)
-    override val rootParser = oneOrMore(astParser) //TODO make this correct
+    override val rootParser = oneOrMore(statement) //TODO make this correct
 }

@@ -37,7 +37,7 @@ fun typeInfer(context : Map<String, Type>, expr : Expr) : Type {
             }
             is FunCall -> {
                 val (id, args) = currExpr
-                val (dom, cod) = context[id] as? TFunction ?:
+                val (dom, cod) = context[id.id] as? TFunction ?:
                         err("Function $id not typed at callsite")
                 when {
                     args.size < dom.size -> err("Not enough arguments provided to $id")
