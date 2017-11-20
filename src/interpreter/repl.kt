@@ -8,7 +8,7 @@ const val prelude: String = "ts> "
 const val quit: String = "--quit"
 
 fun main(args : Array<String>) {
-    val environment = mutableMapOf<String, Value>()
+    val environment = Scope(local = mutableMapOf())
     val functionDefs = mutableMapOf<String, Func>("print" to Print, "len" to Len, "str" to Str, "push" to Push)
     stdLib.forEach { exec(it, environment, functionDefs) }
     while(true) {

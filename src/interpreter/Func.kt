@@ -22,20 +22,20 @@ sealed class Func(val id : String, val args : List<AnnotatedVar>, val returnType
 }
 
 class TommyFunc(id : String, args : List<AnnotatedVar>, returnType : Type, val statements : Body,
-                val environment : Map<String, Value>)
+                val closure : Scope)
     : Func(id, args, returnType) {
     override fun equals(other : Any?) = other is TommyFunc && super.equals(other) &&
-            statements == other.statements && environment == other.environment
+            statements == other.statements && closure == other.closure
 
     override fun toString() = "Func(id=$id, args=$args, returnType=$returnType, " +
-            "statements=$statements, environment=$environment)"
+            "statements=$statements, closure=$closure)"
 
     override fun hashCode() = 31 * super.hashCode() + statements.hashCode()
     operator fun component4() = statements
-    operator fun component5() = environment
+    operator fun component5() = closure
     fun copy(id : String = this.id, args : List<AnnotatedVar> = this.args,
              returnType : Type = this.returnType, statements : Body = this.statements,
-             environment : Map<String, Value> = this.environment) =
+             environment : Scope = this.closure) =
             TommyFunc(id, args, returnType, statements, environment)
 }
 

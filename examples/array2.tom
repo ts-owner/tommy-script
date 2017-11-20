@@ -1,8 +1,6 @@
 let printArr(arr : [Int]) : Unit =
     print("[")
-    if len(arr) == 0 then
-        println("]")
-    else
+    if len(arr) > 0 then
         let flag = true
         for x in arr do
             if flag then
@@ -13,8 +11,8 @@ let printArr(arr : [Int]) : Unit =
                 print(x)
             end
         end
-        println("]")
     end
+    println("]")
 end
 
 let test = [3]
