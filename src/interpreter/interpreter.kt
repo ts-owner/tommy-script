@@ -4,35 +4,99 @@ import core.*
 import standard_library.stdLib
 import java.lang.Math.pow
 
-fun PreOp.eval(arg : Value) = when(this) {
-    PreOp.plus -> arg as? VInt ?: throw IncorrectTypeException(wrongVal = arg)
-    PreOp.negate -> if(arg is VInt) VInt(-arg.value) else throw IncorrectTypeException(wrongVal = arg)
-    PreOp.not -> if(arg is VBool) VBool(!arg.value) else throw IncorrectTypeException(wrongVal = arg)
+fun PreOp.eval(arg : Expr, environment : Scope, functionDefs : MutableMap<String, Func>) : Value = when(this) {
+    PreOp.plus -> eval(arg, environment, functionDefs).let {
+        v -> v as? VInt ?: throw IncorrectTypeException(wrongVal = v)
+    }
+    PreOp.negate -> eval(arg, environment, functionDefs).let {
+        v -> if (v is VInt) VInt(-v.value) else throw IncorrectTypeException(wrongVal = v)
+    }
+    PreOp.not -> eval(arg, environment, functionDefs).let {
+        v -> if(v is VBool) VBool(!v.value) else throw IncorrectTypeException(wrongVal = v)
+    }
 }
 
-fun InOp.eval(lhs : Value, rhs : Value) : Value {
-    val iLeft by lazy(LazyThreadSafetyMode.NONE) { (lhs as? VInt ?: throw IncorrectTypeException(wrongVal = lhs)).value }
-    val iRight by lazy(LazyThreadSafetyMode.NONE) { (rhs as? VInt ?: throw IncorrectTypeException(wrongVal = rhs)).value }
-    val bLeft by lazy(LazyThreadSafetyMode.NONE) { (lhs as? VBool ?: throw IncorrectTypeException(wrongVal = lhs)).value }
-    val bRight by lazy(LazyThreadSafetyMode.NONE) { (rhs as? VBool ?: throw IncorrectTypeException(wrongVal = rhs)).value }
-    val sLeft by lazy(LazyThreadSafetyMode.NONE) { (lhs as? VString ?: throw IncorrectTypeException(wrongVal = lhs)).value }
-    val sRight by lazy(LazyThreadSafetyMode.NONE) { (rhs as? VString ?: throw IncorrectTypeException(wrongVal = rhs)).value }
-    return when (this) {
-        InOp.plus -> VInt(iLeft + iRight)
-        InOp.subtract -> VInt(iLeft - iRight)
-        InOp.times -> VInt(iLeft * iRight)
-        InOp.div -> VInt(iLeft / iRight)
-        InOp.mod -> VInt(iLeft % iRight)
-        InOp.power -> VInt(pow(iLeft.toDouble(), iRight.toDouble()).toInt())
-        InOp.eqInt -> VBool(iLeft == iRight)
-        InOp.neq -> VBool(iLeft != iRight)
-        InOp.lt -> VBool(iLeft < iRight)
-        InOp.gt -> VBool(iLeft > iRight)
-        InOp.leq -> VBool(iLeft <= iRight)
-        InOp.geq -> VBool(iLeft >= iRight)
-        InOp.and -> VBool(bLeft && bRight)
-        InOp.or -> VBool(bLeft || bRight)
-        InOp.concat -> VString(sLeft + sRight)
+fun InOp.eval(lhs : Expr, rhs : Expr, environment : Scope, functionDefs : MutableMap<String, Func>) = when (this) {
+    InOp.plus -> {
+        val left = eval(lhs, environment, functionDefs).let { v -> (v as? VInt)?.value ?: throw IncorrectTypeException(wrongVal = v) }
+        val right = eval(rhs, environment, functionDefs).let { v -> (v as? VInt)?.value ?: throw IncorrectTypeException(wrongVal = v) }
+        VInt(left + right)
+    }
+    InOp.subtract -> {
+        val left = eval(lhs, environment, functionDefs).let { v -> (v as? VInt)?.value ?: throw IncorrectTypeException(wrongVal = v) }
+        val right = eval(rhs, environment, functionDefs).let { v -> (v as? VInt)?.value ?: throw IncorrectTypeException(wrongVal = v) }
+        VInt(left - right)
+    }
+    InOp.times -> {
+        val left = eval(lhs, environment, functionDefs).let { v -> (v as? VInt)?.value ?: throw IncorrectTypeException(wrongVal = v) }
+        val right = eval(rhs, environment, functionDefs).let { v -> (v as? VInt)?.value ?: throw IncorrectTypeException(wrongVal = v) }
+        VInt(left * right)
+    }
+    InOp.div -> {
+        val left = eval(lhs, environment, functionDefs).let { v -> (v as? VInt)?.value ?: throw IncorrectTypeException(wrongVal = v) }
+        val right = eval(rhs, environment, functionDefs).let { v -> (v as? VInt)?.value ?: throw IncorrectTypeException(wrongVal = v) }
+        VInt(left / right)
+    }
+    InOp.mod -> {
+        val left = eval(lhs, environment, functionDefs).let { v -> (v as? VInt)?.value ?: throw IncorrectTypeException(wrongVal = v) }
+        val right = eval(rhs, environment, functionDefs).let { v -> (v as? VInt)?.value ?: throw IncorrectTypeException(wrongVal = v) }
+        VInt(left % right)
+    }
+    InOp.power -> {
+        val left = eval(lhs, environment, functionDefs).let { v -> (v as? VInt)?.value ?: throw IncorrectTypeException(wrongVal = v) }
+        val right = eval(rhs, environment, functionDefs).let { v -> (v as? VInt)?.value ?: throw IncorrectTypeException(wrongVal = v) }
+        VInt(Math.pow(left.toDouble(), right.toDouble()).toInt())
+    }
+    InOp.eqInt -> {
+        val left = eval(lhs, environment, functionDefs).let { v -> (v as? VInt)?.value ?: throw IncorrectTypeException(wrongVal = v) }
+        val right = eval(rhs, environment, functionDefs).let { v -> (v as? VInt)?.value ?: throw IncorrectTypeException(wrongVal = v) }
+        VBool(left == right)
+    }
+    InOp.neq -> {
+        val left = eval(lhs, environment, functionDefs).let { v -> (v as? VInt)?.value ?: throw IncorrectTypeException(wrongVal = v) }
+        val right = eval(rhs, environment, functionDefs).let { v -> (v as? VInt)?.value ?: throw IncorrectTypeException(wrongVal = v) }
+        VBool(left == right)
+    }
+    InOp.lt -> {
+        val left = eval(lhs, environment, functionDefs).let { v -> (v as? VInt)?.value ?: throw IncorrectTypeException(wrongVal = v) }
+        val right = eval(rhs, environment, functionDefs).let { v -> (v as? VInt)?.value ?: throw IncorrectTypeException(wrongVal = v) }
+        VBool(left < right)
+    }
+    InOp.gt -> {
+        val left = eval(lhs, environment, functionDefs).let { v -> (v as? VInt)?.value ?: throw IncorrectTypeException(wrongVal = v) }
+        val right = eval(rhs, environment, functionDefs).let { v -> (v as? VInt)?.value ?: throw IncorrectTypeException(wrongVal = v) }
+        VBool(left > right)
+    }
+    InOp.leq -> {
+        val left = eval(lhs, environment, functionDefs).let { v -> (v as? VInt)?.value ?: throw IncorrectTypeException(wrongVal = v) }
+        val right = eval(rhs, environment, functionDefs).let { v -> (v as? VInt)?.value ?: throw IncorrectTypeException(wrongVal = v) }
+        VBool(left <= right)
+    }
+    InOp.geq -> {
+        val left = eval(lhs, environment, functionDefs).let { v -> (v as? VInt)?.value ?: throw IncorrectTypeException(wrongVal = v) }
+        val right = eval(rhs, environment, functionDefs).let { v -> (v as? VInt)?.value ?: throw IncorrectTypeException(wrongVal = v) }
+        VBool(left >= right)
+    }
+    InOp.and -> {
+        val left = eval(lhs, environment, functionDefs).let { v -> (v as? VBool)?.value ?: throw IncorrectTypeException(wrongVal = v) }
+        if(left) {
+            val right = eval(rhs, environment, functionDefs).let { v -> (v as? VBool)?.value ?: throw IncorrectTypeException(wrongVal = v) }
+            VBool(right)
+        }
+        else VBool(false)
+    }
+    InOp.or -> {
+        val left = eval(lhs, environment, functionDefs).let { v -> (v as? VBool)?.value ?: throw IncorrectTypeException(wrongVal = v) }
+        if(left) VBool(true)
+        else {
+            val right = eval(rhs, environment, functionDefs).let { v -> (v as? VBool)?.value ?: throw IncorrectTypeException(wrongVal = v) }
+            VBool(right)
+        }
+    }
+    InOp.concat -> {
+        val left = eval(lhs, environment, functionDefs).let { v -> (v as? VString)?.value ?: throw IncorrectTypeException(wrongVal = v) }
+        val right = eval(rhs, environment, functionDefs).let { v -> (v as? VString)?.value ?: throw IncorrectTypeException(wrongVal = v) }
+        VString(left + right)
     }
 }
 
@@ -70,8 +134,8 @@ fun eval(expr : Expr, environment : Scope, functionDefs : MutableMap<String, Fun
     is LBool -> VBool(expr.value)
     is LArray -> VArray(expr.value.mapTo(mutableListOf()) { eval(it, environment, functionDefs) })
     is LUnit -> VUnit
-    is Prefix -> expr.op.eval(eval(expr.arg, environment, functionDefs))
-    is Infix -> expr.op.eval(eval(expr.lhs, environment, functionDefs), eval(expr.rhs, environment, functionDefs))
+    is Prefix -> expr.op.eval(expr.arg, environment, functionDefs)
+    is Infix -> expr.op.eval(expr.lhs, expr.rhs, environment, functionDefs)
     is Var -> environment[expr.id] ?: throw UndefinedVariableException(wrongExpr = expr, wrongId = expr.id).apply {
         println("scope is $environment when getting the variable ${expr.id}")
     }
