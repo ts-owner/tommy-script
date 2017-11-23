@@ -1,5 +1,5 @@
 let merge_sort(arr : [Int]) : [Int] =
-    if len(arr) == 1 then
+    if len(arr) <= 1 then return arr
     elseif len(arr) == 2 then
         if arr[1] > arr[0] then
             return [arr[0], arr[1]]
@@ -19,6 +19,9 @@ let merge_sort(arr : [Int]) : [Int] =
             push(right, arr[partition + i])
             i = i + 1
         end
+        if len(arr) % 2 == 1 then
+            push(right, arr[len(arr) - 1])
+        end
 
         left = merge_sort(left)
         right = merge_sort(right)
@@ -35,16 +38,13 @@ let merge_sort(arr : [Int]) : [Int] =
             end
         end
 
-        if r > l then
-            while l != r do
-                push(result, left[l])
-                l = l + 1
-            end
-        else
-            while r != l do
-                push(result, right[r])
-                r = r + 1
-            end
+        while l < len(left) do
+            push(result, left[l])
+            l = l + 1
+        end
+        while r < len(right) do
+            push(result, right[r])
+            r = r + 1
         end
         return result
     end

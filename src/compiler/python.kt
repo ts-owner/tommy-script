@@ -7,13 +7,13 @@ import java.io.File
 import java.util.*
 import java.util.concurrent.TimeUnit
 
-fun PreOp.toPython() = when(this) {
+private fun PreOp.toPython() = when(this) {
     PreOp.plus -> ""
     PreOp.negate -> "-"
     PreOp.not -> "not"
 }
 
-fun InOp.toPython() = when(this) {
+private fun InOp.toPython() = when(this) {
     InOp.plus -> "+"
     InOp.subtract -> "-"
     InOp.times -> "*"
@@ -31,25 +31,25 @@ fun InOp.toPython() = when(this) {
     InOp.neq -> "!="
 }
 
-fun handleSpecialFunctions(func : FunCall) = when(func.id.id) {
+// Python names certain functions differently
+private fun handleSpecialFunctions(func : FunCall) = when(func.id.id) {
     "print" -> "print(${func.args.joinToString(", ", transform = ::compile)}, end='', flush=True)"
     "concat" -> "${compile(func.args[0])} + ${compile(func.args[1])}"
     "push" -> "${compile(func.args[0])}.append(${compile(func.args[1])})"
     else -> null
 }
 
-fun String.escaped() : String {
-    val builder = StringBuilder()
-    for(c in this) {
+private fun String.escaped() : String = buildString {
+    for(c in this@escaped) {
         val unescaped = escapeChars.entries.find { it.value == c }?.key
         when(unescaped) {
-            null -> builder.append(c)
-            else -> builder.append("\\$unescaped")
+            null -> append(c)
+            else -> append("\\$unescaped")
         }
     }
-    return builder.toString()
 }
 
+// Turns a tommy-script expression into its python representation
 private fun compile(expr : Expr) : String = when(expr) {
     is Var -> expr.id // TODO: Name scrambling?
     is Prefix -> "(${expr.op.toPython()} ${compile(expr.arg)})"
@@ -60,18 +60,20 @@ private fun compile(expr : Expr) : String = when(expr) {
     is LString -> "\"${expr.value.escaped()}\""
     is LBool -> if(expr.value) "True" else "False"
     is LArray -> expr.value.joinToString(prefix = "[", postfix = "]", transform = ::compile)
-    is LUnit -> "None"
+    is LUnit -> "None" // TODO: Choose a better representation?
     is ArrayAccess -> "${expr.name.id}[${compile(expr.index)}]"
 }
 
 private val indentStr = "    "
 
+// Turns a tommy-script statement into its python representation
 private fun compile(stmt : Stmt, indent : String) : String {
     val newIndent = "$indent$indentStr"
-    val end = "\n${newIndent}pass"
-    fun Body.joinBody() = joinToString("\n") { compile(it, newIndent) }
-    return when(stmt) {
-        is EvalExpr -> indent + compile(stmt.expr)
+    // Our ifs/function declarations/etc... allow for empty bodies, but python's don't
+    // Thus we append a nop to each body
+    fun Body.joinBody() = joinToString("\n") { compile(it, newIndent) } + "\n${newIndent}pass"
+    return indent + when(stmt) {
+        is EvalExpr -> compile(stmt.expr)
         is IfStep -> {
             val (cond, body, next) = stmt
             val thenStr = body.joinBody()
@@ -80,33 +82,34 @@ private fun compile(stmt : Stmt, indent : String) : String {
                 is Else -> compile(next, indent)
                 null -> ""
             }
-            "${indent}if ${compile(cond)}:\n$thenStr$end\n$elseStr"
+            "if ${compile(cond)}:\n$thenStr\n$elseStr"
         }
         // TODO: Make sure we can't transpile a standalone else
-        is Else -> "${indent}else:\n${stmt.body.joinBody()}$end"
-        is VarDef -> "$indent${stmt.lhs.id} = ${compile(stmt.rhs)}"
-        is UntypedVarDef -> "$indent${stmt.lhs.id} = ${compile(stmt.rhs)}"
-        is VarReassign -> "$indent${stmt.lhs.id} = ${compile(stmt.rhs)}"
-        is ArrayAssignment -> "$indent${stmt.lhs.id}[${compile(stmt.index)}] = ${compile(stmt.rhs)}"
+        is Else -> "else:\n${stmt.body.joinBody()}"
+        is VarDef -> "${stmt.lhs.id} = ${compile(stmt.rhs)}"
+        is UntypedVarDef -> "${stmt.lhs.id} = ${compile(stmt.rhs)}"
+        is VarReassign -> "${stmt.lhs.id} = ${compile(stmt.rhs)}"
+        is ArrayAssignment -> "${stmt.lhs.id}[${compile(stmt.index)}] = ${compile(stmt.rhs)}"
         is FunDef -> {
             val (id, args, _, statements) = stmt
             val argStr = args.joinToString(transform = AnnotatedVar::id)
             val bodyStr = statements.joinBody()
-            "${indent}def ${id.id}($argStr):\n$bodyStr$end"
+            "def ${id.id}($argStr):\n$bodyStr"
         }
         is While -> {
             val bodyStr = stmt.body.joinBody()
-            "${indent}while ${compile(stmt.cond)}:\n$bodyStr$end"
+            "while ${compile(stmt.cond)}:\n$bodyStr"
         }
         is For -> {
             val (id, list, body) = stmt
             val bodyStr = body.joinBody()
-            "${indent}for ${id.id} in ${compile(list)}:\n$bodyStr$end"
+            "for ${id.id} in ${compile(list)}:\n$bodyStr"
         }
-        is Return -> "${indent}return ${compile(stmt.toReturn)}"
+        is Return -> "return ${compile(stmt.toReturn)}"
     }
 }
 
+// We only expose the t
 fun compile(stmt : Stmt) = compile(stmt, "")
 
 fun execByPy(prog : List<Stmt>) {

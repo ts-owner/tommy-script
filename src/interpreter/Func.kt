@@ -21,6 +21,7 @@ sealed class Func(val id : String, val args : List<AnnotatedVar>, val returnType
     operator fun component3() = returnType
 }
 
+// User defined functions
 class TommyFunc(id : String, args : List<AnnotatedVar>, returnType : Type, val statements : Body,
                 val closure : Scope)
     : Func(id, args, returnType) {

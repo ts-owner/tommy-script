@@ -19,13 +19,11 @@ object TUnit : Type() {
 }
 
 object TArray : Type() {
-    override fun toString() : String {
-        return "[TODO]"
-    }
+    override fun toString() = "[TODO]"
 }
 
 data class TFunction(val dom : List<Type>, val cod : Type) : Type() {
-    override fun toString() = "(${dom.joinToString()}) → $cod"
+    override fun toString() = "(${dom.joinToString()}) -> $cod"
 }
 
 object TAny : Type() {
@@ -50,7 +48,7 @@ enum class InOp(val asText : String, val type : TFunction, val precedence : Int)
     eqInt("==", relationOn(2, TInt), 9), lt("<", relationOn(2, TInt), 9),
     gt(">", relationOn(2, TInt), 9), leq("<=", relationOn(2, TInt), 9),
     geq(">=", relationOn(2, TInt), 9), neq("!=", relationOn(2, TInt), 9);
-    //not sure about precedence level of ++, should be pretty low, work out examples
+    // TODO: Determind precedence of ++
 
     override fun toString() = asText
 }
@@ -64,7 +62,6 @@ data class Var(val id : String) : Expr()
 
 // Recursive expression constructors
 data class Prefix(val op : PreOp, val arg : Expr) : Expr()
-
 data class Infix(val op : InOp, val lhs : Expr, val rhs : Expr) : Expr()
 data class FunCall(val id : Var, val args : List<Expr>) : Expr()
 data class ArrayAccess(val name : Var, val index : Expr) : Expr()

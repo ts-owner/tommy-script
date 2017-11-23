@@ -16,6 +16,7 @@ fun PreOp.evalOn(arg : Expr, environment : Scope, functionDefs : MutableMap<Stri
         }
     }
 
+// We pass in the args unevaluated so that `and` and `or` can be lazy.
 fun InOp.evalOn(lhs : Expr, rhs : Expr, environment : Scope, functionDefs : MutableMap<String, Func>) = when (this) {
     InOp.plus -> {
         val left = eval(lhs, environment, functionDefs).let { v -> (v as? VInt)?.value ?: throw IncorrectTypeException(wrongVal = v) }
@@ -114,11 +115,14 @@ fun eval(expr : Expr, environment : Scope, functionDefs : MutableMap<String, Fun
                 ?: throw UndefinedVariableException(wrongExpr = expr, wrongId = expr.id.id)
         if(func.args.size != expr.args.size) throw IncorrectArgumentCountException(wrongCall = expr, called = func)
         val evaledArgs = expr.args.map { argExpr -> eval(argExpr, environment, functionDefs) }
-        val ret = when(func) {
+        when(func) {
             is TommyFunc -> {
-                val (id, argAnnIds, _, body, closure) = func
-                val argIds = argAnnIds.map { (argId, _) -> argId }
-                val argBindings = mutableMapOf<String, Value>().apply { putAll(argIds.zip(evaledArgs)) }
+                val (_, argAnnIds, _, body, closure) = func
+                val argBindings = mutableMapOf<String, Value>()
+                for(i in argAnnIds.indices) {
+                    val (argName, _) = argAnnIds[i]
+                    argBindings[argName] = evaledArgs[i]
+                }
                 val localCtx = Scope(local = argBindings, parent = closure)
                 try {
                     body.forEach {
@@ -131,7 +135,6 @@ fun eval(expr : Expr, environment : Scope, functionDefs : MutableMap<String, Fun
             }
             is BuiltIn -> func(evaledArgs)
         }
-        ret
     }
     is ArrayAccess -> {
         val (name, indexExpr) = expr
@@ -162,13 +165,13 @@ fun exec(stmt : Statement, environment : Scope, functionDefs : MutableMap<String
         }
         is VarDef -> {
             val id = stmt.lhs.id
-            if(id in environment) throw RedefineVariableException(wrongId = id, wrongStmt = stmt)
+            if(id in environment.local) throw RedefineVariableException(wrongId = id, wrongStmt = stmt)
             val rhs = eval(stmt.rhs, environment, functionDefs)
             environment[id] = rhs
         }
         is UntypedVarDef -> {
             val id = stmt.lhs.id
-            if(id in environment) throw RedefineVariableException(wrongId = id, wrongStmt = stmt)
+            if(id in environment.local) throw RedefineVariableException(wrongId = id, wrongStmt = stmt)
             val rhs = eval(stmt.rhs, environment, functionDefs)
             environment[id] = rhs
         }

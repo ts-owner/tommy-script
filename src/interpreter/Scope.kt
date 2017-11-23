@@ -1,20 +1,24 @@
 package interpreter
 
-data class Scope(private val local : MutableMap<String, Value> = mutableMapOf(), val parent : Scope? = null)
+// Representation of the current scope
+// Scopes keep track of their parent scope, allow shadowing of variables defined there,
+// and only allow access to variables defined in their parent env at their creation
+// We assume variables can't be undefined
+data class Scope(val local : MutableMap<String, Value> = mutableMapOf(), val parent : Scope? = null)
     : MutableMap<String, Value> {
     private val bound : Set<String> = parent?.keys ?: emptySet()
     override val entries : MutableSet<MutableMap.MutableEntry<String, Value>>
         get() {
             val entrySet = mutableSetOf<MutableMap.MutableEntry<String, Value>>()
             entrySet.addAll(local.entries)
-            if(parent != null) entrySet.addAll(parent.entries)
+            parent?.entries?.forEach { if(it.key in bound) entrySet.add(it) }
             return entrySet
         }
     override val keys : MutableSet<String>
         get() {
             val keySet = mutableSetOf<String>()
             keySet.addAll(local.keys)
-            if(parent != null) keySet.addAll(parent.keys)
+            keySet.addAll(bound)
             return keySet
         }
     override val size
@@ -27,24 +31,22 @@ data class Scope(private val local : MutableMap<String, Value> = mutableMapOf(),
             return valueList
         }
     override fun containsKey(key : String) = key in local || key in bound
-    override fun containsValue(value : Value) = local.containsValue(value) ||
-                                                bound.any { id -> parent!![id] == value }
+    override fun containsValue(value : Value) = local.containsValue(value) || bound.any { id -> parent!![id] == value }
     override fun get(key : String) : Value? = local[key] ?: parent?.get(key)?.takeIf { key in bound }
     override fun isEmpty() = local.isEmpty() && bound.isEmpty()
-    override fun clear() = local.clear()
+    override fun clear() {
+        local.clear()
+        parent?.clear()
+    }
+
     override fun put(key : String, value : Value) : Value? {
-        if(key in local) {
-            val oldValue = local[key]!!
-            local[key] = value
-            return oldValue
-        } else if(parent != null && key in parent) {
-            val oldValue = parent[key]!!
+        val oldValue = this[key]
+        if(parent != null && key in parent) {
             parent[key] = value
-            return oldValue
         } else {
             local[key] = value
-            return null
         }
+        return oldValue
     }
 
     override fun remove(key : String) : Value? {
@@ -55,6 +57,7 @@ data class Scope(private val local : MutableMap<String, Value> = mutableMapOf(),
     }
 
     override fun putAll(from : Map<out String, Value>) = from.forEach { id, value -> this.put(id, value) }
+
     fun prettyPrint() : String {
         val parentEntries = parent?.entries ?: mutableSetOf()
         parentEntries.removeIf { it.key !in bound || it.key in local.keys }
