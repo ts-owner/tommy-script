@@ -4,19 +4,19 @@ import core.*
 import standard_library.stdLib
 import java.lang.Math.pow
 
-fun PreOp.eval(arg : Expr, environment : Scope, functionDefs : MutableMap<String, Func>) : Value = when(this) {
-    PreOp.plus -> eval(arg, environment, functionDefs).let {
-        v -> v as? VInt ?: throw IncorrectTypeException(wrongVal = v)
+fun PreOp.evalOn(arg : Expr, environment : Scope, functionDefs : MutableMap<String, Func>) : Value = when(this) {
+        PreOp.plus -> eval(arg, environment, functionDefs).let { v ->
+            v as? VInt ?: throw IncorrectTypeException(wrongVal = v)
+        }
+        PreOp.negate -> eval(arg, environment, functionDefs).let { v ->
+            if(v is VInt) VInt(-v.value) else throw IncorrectTypeException(wrongVal = v)
+        }
+        PreOp.not -> eval(arg, environment, functionDefs).let { v ->
+            if(v is VBool) VBool(!v.value) else throw IncorrectTypeException(wrongVal = v)
+        }
     }
-    PreOp.negate -> eval(arg, environment, functionDefs).let {
-        v -> if (v is VInt) VInt(-v.value) else throw IncorrectTypeException(wrongVal = v)
-    }
-    PreOp.not -> eval(arg, environment, functionDefs).let {
-        v -> if(v is VBool) VBool(!v.value) else throw IncorrectTypeException(wrongVal = v)
-    }
-}
 
-fun InOp.eval(lhs : Expr, rhs : Expr, environment : Scope, functionDefs : MutableMap<String, Func>) = when (this) {
+fun InOp.evalOn(lhs : Expr, rhs : Expr, environment : Scope, functionDefs : MutableMap<String, Func>) = when (this) {
     InOp.plus -> {
         val left = eval(lhs, environment, functionDefs).let { v -> (v as? VInt)?.value ?: throw IncorrectTypeException(wrongVal = v) }
         val right = eval(rhs, environment, functionDefs).let { v -> (v as? VInt)?.value ?: throw IncorrectTypeException(wrongVal = v) }
@@ -45,7 +45,7 @@ fun InOp.eval(lhs : Expr, rhs : Expr, environment : Scope, functionDefs : Mutabl
     InOp.power -> {
         val left = eval(lhs, environment, functionDefs).let { v -> (v as? VInt)?.value ?: throw IncorrectTypeException(wrongVal = v) }
         val right = eval(rhs, environment, functionDefs).let { v -> (v as? VInt)?.value ?: throw IncorrectTypeException(wrongVal = v) }
-        VInt(Math.pow(left.toDouble(), right.toDouble()).toInt())
+        VInt(pow(left.toDouble(), right.toDouble()).toInt())
     }
     InOp.eqInt -> {
         val left = eval(lhs, environment, functionDefs).let { v -> (v as? VInt)?.value ?: throw IncorrectTypeException(wrongVal = v) }
@@ -100,61 +100,38 @@ fun InOp.eval(lhs : Expr, rhs : Expr, environment : Scope, functionDefs : Mutabl
     }
 }
 
-fun retPass(function : TommyFunc) : TommyFunc {
-    val (id, _, _, body, _) = function
-    val retVar = Var("$id+")
-    val retFlag = Var("$id&")
-    val newBody : MutableList<Stmt> =
-            mutableListOf(UntypedVarDef(retVar, LUnit), UntypedVarDef(retFlag, LBool(false)))
-    fun rewriteReturn(stmt : Stmt) : Stmt {
-        fun wrap(curr : Stmt) = IfStep(Prefix(PreOp.not, retFlag), listOf(curr), null)
-        fun rewriteIf(ifS : If) : If = when(ifS) {
-            is IfStep -> IfStep(ifS.cond, ifS.body.map(::rewriteReturn), ifS.next?.let { rewriteIf(it) })
-            is Else -> Else(ifS.body.map(::rewriteReturn))
-        }
-        return when (stmt) {
-            is Return -> {
-                IfStep(Prefix(PreOp.not, retFlag),
-                        listOf(VarReassign(retVar, stmt.toReturn), VarReassign(retFlag, LBool(true))), null)
-            }
-            is IfStep -> wrap(rewriteIf(stmt))
-            is Else -> wrap(Else(stmt.body.map(::rewriteReturn)))
-            is While -> wrap(While(stmt.cond, stmt.body.map(::rewriteReturn)))
-            is For -> wrap(For(stmt.elemIdent, stmt.list, stmt.body.map(::rewriteReturn)))
-            is EvalExpr, is UntypedVarDef, is VarDef, is VarReassign, is ArrayAssignment, is FunDef -> wrap(stmt)
-        }
-    }
-    newBody.addAll(body.map(::rewriteReturn))
-    return function.copy(statements = newBody)
-}
-
 fun eval(expr : Expr, environment : Scope, functionDefs : MutableMap<String, Func>) : Value = when (expr) {
     is LInt -> VInt(expr.value)
     is LString -> VString(expr.value)
     is LBool -> VBool(expr.value)
     is LArray -> VArray(expr.value.mapTo(mutableListOf()) { eval(it, environment, functionDefs) })
     is LUnit -> VUnit
-    is Prefix -> expr.op.eval(expr.arg, environment, functionDefs)
-    is Infix -> expr.op.eval(expr.lhs, expr.rhs, environment, functionDefs)
-    is Var -> environment[expr.id] ?: throw UndefinedVariableException(wrongExpr = expr, wrongId = expr.id).apply {
-        println("scope is $environment when getting the variable ${expr.id}")
-    }
+    is Prefix -> expr.op.evalOn(expr.arg, environment, functionDefs)
+    is Infix -> expr.op.evalOn(expr.lhs, expr.rhs, environment, functionDefs)
+    is Var -> environment[expr.id] ?: throw UndefinedVariableException(wrongExpr = expr, wrongId = expr.id)
     is FunCall -> {
         val func = functionDefs[expr.id.id]
                 ?: throw UndefinedVariableException(wrongExpr = expr, wrongId = expr.id.id)
         if(func.args.size != expr.args.size) throw IncorrectArgumentCountException(wrongCall = expr, called = func)
         val evaledArgs = expr.args.map { argExpr -> eval(argExpr, environment, functionDefs) }
-        when(func) {
+        val ret = when(func) {
             is TommyFunc -> {
                 val (id, argAnnIds, _, body, closure) = func
                 val argIds = argAnnIds.map { (argId, _) -> argId }
                 val argBindings = mutableMapOf<String, Value>().apply { putAll(argIds.zip(evaledArgs)) }
                 val localCtx = Scope(local = argBindings, parent = closure)
-                body.forEach { exec(it, localCtx, functionDefs) }
-                localCtx["$id+"] ?: throw InvalidPassException(wrongStmt = EvalExpr(expr), pass = "return desugaring")
+                try {
+                    body.forEach {
+                        exec(it, localCtx, functionDefs)
+                    }
+                    VUnit
+                } catch(box : ReturnBox) {
+                    box.ret
+                }
             }
             is BuiltIn -> func(evaledArgs)
         }
+        ret
     }
     is ArrayAccess -> {
         val (name, indexExpr) = expr
@@ -217,9 +194,12 @@ fun exec(stmt : Statement, environment : Scope, functionDefs : MutableMap<String
             val (id, args, retTy, body) = stmt
             if(id.id in functionDefs) throw RedefineVariableException(wrongId = id.id, wrongStmt = stmt)
             val funcScope = Scope(parent = environment)
-            functionDefs[id.id] = retPass(TommyFunc(id.id, args, retTy, body, funcScope))
+            functionDefs[id.id] = TommyFunc(id.id, args, retTy, body, funcScope)
         }
-        is Return -> throw InvalidPassException(wrongStmt = stmt, pass = "return desugaring")
+        is Return -> {
+            val evaled = eval(stmt.toReturn, environment, functionDefs)
+            throw ReturnBox(ret = evaled)
+        }
         is While -> {
             val (condExpr, body) = stmt
             fun currCond() = eval(condExpr, environment, functionDefs).let { evaled ->
@@ -266,3 +246,5 @@ fun interpretProgram(prog : List<Stmt>) {
     stdLib.forEach { exec(it, progScope, functionDefs) }
     prog.forEach { interp(it, progScope, functionDefs) }
 }
+
+private data class ReturnBox(val ret : Value) : Throwable()
