@@ -1,5 +1,7 @@
 package core
 
+import core.Associativity.*
+
 sealed class Type
 
 object TInt : Type() {
@@ -40,14 +42,16 @@ enum class PreOp(val asText : String, val type : TFunction, val precedence : Int
     override fun toString() = asText
 }
 
-enum class InOp(val asText : String, val type : TFunction, val precedence : Int) {
-    plus("+", opType(2, TInt), 10), subtract("-", opType(2, TInt), 10),
-    times("*", opType(2, TInt), 11), div("/", opType(2, TInt), 11), mod("%", opType(2, TInt), 11),
-    power("**", opType(2, TInt), 13), concat("++", opType(2, TString), 13),
-    and("and", opType(2, TBool), 5), or("or", opType(2, TBool), 4),
-    eqInt("==", relationOn(2, TInt), 9), lt("<", relationOn(2, TInt), 9),
-    gt(">", relationOn(2, TInt), 9), leq("<=", relationOn(2, TInt), 9),
-    geq(">=", relationOn(2, TInt), 9), neq("!=", relationOn(2, TInt), 9);
+enum class Associativity { LEFT, RIGHT }
+
+enum class InOp(val asText : String, val type : TFunction, val precedence : Int, val associativity : Associativity) {
+    plus("+", opType(2, TInt), 10, LEFT), subtract("-", opType(2, TInt), 10, LEFT),
+    times("*", opType(2, TInt), 11, LEFT), div("/", opType(2, TInt), 11, LEFT), mod("%", opType(2, TInt), 11, LEFT),
+    power("**", opType(2, TInt), 13, RIGHT), concat("++", opType(2, TString), 13, RIGHT),
+    and("and", opType(2, TBool), 5, LEFT), or("or", opType(2, TBool), 4, LEFT),
+    eqInt("==", relationOn(2, TInt), 9, LEFT), lt("<", relationOn(2, TInt), 9, LEFT),
+    gt(">", relationOn(2, TInt), 9, LEFT), leq("<=", relationOn(2, TInt), 9, LEFT),
+    geq(">=", relationOn(2, TInt), 9, LEFT), neq("!=", relationOn(2, TInt), 9, LEFT);
     // TODO: Determind precedence of ++
 
     override fun toString() = asText

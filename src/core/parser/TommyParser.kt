@@ -4,8 +4,14 @@ import com.github.h0tk3y.betterParse.combinators.*
 import com.github.h0tk3y.betterParse.grammar.Grammar
 import com.github.h0tk3y.betterParse.grammar.parser
 import com.github.h0tk3y.betterParse.grammar.tryParseToEnd
+import com.github.h0tk3y.betterParse.lexer.TokenMatch
 import com.github.h0tk3y.betterParse.parser.*
+import com.sun.org.apache.xpath.internal.operations.And
 import core.*
+import java.util.*
+
+data class NoSeparator(val separated : Separated<*, *>) : ErrorResult()
+data class MixedAssociativity(val expr : Separated<Expr, InOp>) : ErrorResult()
 
 // Main parser for a program
 class TommyParser : Grammar<List<Stmt>>() {
@@ -13,7 +19,7 @@ class TommyParser : Grammar<List<Stmt>>() {
     private val LPAR by token("\\(")
     private val RPAR by token("\\)")
     private val LBRA by token("\\[")
-    private val RBRA by token("\\]")
+    private val RBRA by token("]")
     private val EQU by token("==")
     private val NEQ by token("!=")
     private val LEQ by token("<=")
@@ -25,7 +31,7 @@ class TommyParser : Grammar<List<Stmt>>() {
     private val EQUALS by token("=")
     private val CONCAT by token("\\+\\+")
     private val PLUS by token("\\+")
-    private val MINUS by token("\\-")
+    private val MINUS by token("-")
     private val DIV by token("/")
     private val MOD by token("%")
     private val POW by token("\\*\\*")
@@ -98,79 +104,45 @@ class TommyParser : Grammar<List<Stmt>>() {
             -DO and zeroOrMore(parser(this::statement)) and
             -END map { (elem, list, body) -> For(Var(elem), list, body) }
 
-    //operators zone
-
-    //make it so there can't be a space between
-    //TODO make this not seizure material
-    //make the levels general. maybe need to pull request/add something
-    //The operators with the highest number in the operator chain happen first. Eg: power function > plus/minus
-
-    //switch out preexper thing with parser(this::expr) later, if it works with preexpr
     private val preexpr = literalParser or funCallParser or arrayGetParser or varParser or arrayParser or
             (-LPAR and parser(this::expr) and -RPAR)
 
-    //POWER FUNCTION (**)
-    val lvFourteenOperatorChain: Parser<Expr> = leftAssociative(preexpr, POW) { l, o, r ->
-        // use o for generalization
-        Infix(InOp.power, l, r)
+    private val expr : Parser<Expr> = kotlin.run {
+        val prefixTokens = biMapOf(PreOp.negate to MINUS, PreOp.plus to PLUS, PreOp.not to NOT)
+        val infixTokens = biMapOf(InOp.plus to PLUS, InOp.subtract to MINUS, InOp.times to TIMES,
+                                  InOp.div to DIV, InOp.mod to MOD, InOp.power to POW, InOp.concat to CONCAT,
+                                  InOp.and to AND, InOp.or to OR, InOp.eqInt to EQU, InOp.lt to LT,
+                                  InOp.gt to GT, InOp.leq to LEQ, InOp.geq to GEQ, InOp.neq to NEQ)
+        val prefixOperators = PreOp.values().groupBy { it.precedence }.mapValues {
+            (_, ops) -> ops.map { prefixTokens[it]!! }
+        }
+        val infixOperators = InOp.values().groupBy { it.precedence }.mapValues {
+            (_, ops) -> ops.map { infixTokens[it]!! }
+        }
+        val precedences : SortedSet<Int> = TreeSet(reverseOrder())
+        prefixOperators.mapTo(precedences) { (prec, _) -> prec }
+        infixOperators.mapTo(precedences) { (prec, _) -> prec }
+        precedences.fold(preexpr) { currExprParser, prec ->
+            val prefixOpParser = OrCombinator(prefixOperators[prec].orEmpty()) map {
+                prefixTokens.inverse[it.type]!!
+            }
+            val prefix = prefixOpParser and currExprParser map { (op, arg) -> Prefix(op, arg) }
+            val infixOps = OrCombinator(infixOperators[prec].orEmpty()) map {
+                infixTokens.inverse[it.type]!!
+            }
+            val infix = separated(currExprParser, infixOps).map {
+                val associativity = it.separators.firstOrNull()?.associativity ?:
+                        return@map NoSeparator(it)
+                if(it.separators.any { op -> op.associativity != associativity })
+                        return@map MixedAssociativity(it)
+                Parsed(when(associativity) {
+                    Associativity.LEFT -> it.reduce { lhs, op, rhs -> Infix(op, lhs, rhs) }
+                    Associativity.RIGHT -> it.reduceRight { lhs, op, rhs -> Infix(op, lhs, rhs) }
+                }, emptySequence())
+            }.join()
+            prefix or infix
+        }
     }
-
-    //PLUS AND MINUS INVERT EACH OTHER
-    val lvThirteenOperatorChain: Parser<Expr> = (PLUS or MINUS) * lvFourteenOperatorChain map { (a, b) ->
-        Prefix(if (a.type == PLUS) PreOp.plus else PreOp.negate, b)
-    }
-
-    //MODULUS (%)
-    var lvTwelveOperatorChain: Parser<Expr> = leftAssociative(lvThirteenOperatorChain or lvFourteenOperatorChain, MOD) { l, o, r ->
-        Infix(InOp.mod, l, r)
-    }
-
-    //give alternative path around prefix operator
-    //MULTIPLICATION AND DIVISION (* and /)
-    val lvElevenOperatorChain: Parser<Expr> = leftAssociative(lvThirteenOperatorChain or lvTwelveOperatorChain, (DIV or TIMES)) { l, o, r ->
-        Infix(if (o.type == DIV) InOp.div else InOp.times, l, r)
-    }
-
-    //PLUS AND MINUS (+ and -)
-    val lvTenOperatorChain: Parser<Expr> = leftAssociative(lvElevenOperatorChain, (PLUS or MINUS)) { l, o, r ->
-        Infix(if (o.type == PLUS) InOp.plus else InOp.subtract, l, r)
-    }
-    //Defining characters as their actual functions (the characters being == and != and <= and >= and < and > )
-    val lvNineOperatorSymbols = EQU or NEQ or LEQ or GEQ or LT or GT
-    private val tokenToOperator = mapOf(
-            EQU to InOp.eqInt, NEQ to InOp.neq, LEQ to InOp.leq, GEQ to InOp.geq, LT to InOp.lt, GT to InOp.gt
-    )
-
-    //COMPARER TOKENS ( == and != and <= and >= and < and > )
-    val lvNineOperatorChain: Parser<Expr> = leftAssociative(lvTenOperatorChain, lvNineOperatorSymbols) { l, o, r ->
-        Infix(tokenToOperator[o.type]!!, l, r)
-    }
-    //NOT
-    val lvSixOperatorChain: Parser<Expr> = NOT * lvNineOperatorChain map { (a, b) ->
-        Prefix(PreOp.not, b)
-    }
-
-    //give alternative path around prefix operator
-    //AND
-    val lvFiveOperatorChain: Parser<Expr> = leftAssociative(lvSixOperatorChain or lvNineOperatorChain, AND) { l, _, r ->
-        Infix(InOp.and, l, r)
-    }
-
-    //OR
-    val lvFourOperatorChain: Parser<Expr> = leftAssociative(lvFiveOperatorChain, OR) { l, _, r ->
-        Infix(InOp.or, l, r)
-    }
-
-
-    //CONCAT
-    val lvThreeOperatorChain: Parser<Expr> = leftAssociative(lvFourOperatorChain, CONCAT) { l, _, r ->
-        Infix(InOp.concat, l, r)
-    }
-    //The chain works by calling lvFourOperatorChain, which in turn calls lvFiveOperatorChain and then does its thing.
-    // But lvFiveOperatorChain calls lvSixOperatorChain, etc.
-    private val expr = lvThreeOperatorChain
-
-    //end operators zone
 
     private val annotatedVarParser = idParser and -COLON and typeParser map { (a, b) -> AnnotatedVar(a, b) }
     private val varDefParser = -LET and annotatedVarParser and -EQUALS and expr map { (a, b) -> VarDef(a, b) }
