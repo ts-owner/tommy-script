@@ -8,6 +8,7 @@ fun prettyPrint(arg : Value) : String = when(arg) {
     is VBool -> arg.value.toString()
     is VArray -> arg.value.joinToString(prefix = "[", postfix = "]", transform = ::prettyPrint)
     is VUnit -> "unit"
+    is VFunction -> "<function ${arg.value.id}>"
 }
 
 // Function objects

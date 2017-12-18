@@ -8,15 +8,18 @@ const val prelude: String = "ts> "
 const val quit: String = "--quit"
 
 fun main(args : Array<String>) {
-    val environment = Scope(local = mutableMapOf())
-    val functionDefs = mutableMapOf<String, Func>("print" to Print, "len" to Len, "str" to Str, "push" to Push)
-    stdLib.forEach { exec(it, environment, functionDefs) }
+    val builtins = mutableMapOf<String, Value>("print" to VFunction(Print),
+            "len" to VFunction(Len),
+            "str" to VFunction(Str),
+            "push" to VFunction(Push))
+    val environment = Scope(builtins)
+    stdLib.forEach { exec(it, environment) }
     while(true) {
         print(prelude)
         val line = readLine()
         if(line == null || line == quit) break
         val prog = TommyParser().parseToEnd(line)[0]
-        interp(prog, environment, functionDefs)
+        interp(prog, environment)
         println()
     }
 }
