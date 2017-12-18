@@ -8,18 +8,11 @@ internal class BindCombinator<T, out R>(
         val innerParser: Parser<T>,
         val transform: (T) -> Parser<R>
 ) : Parser<R> {
-    private fun Parsed<T>.sneakyGetRemainder() : Sequence<TokenMatch> {
-        val ParsedClass = Parsed::class.java
-        val remainderF = ParsedClass.getDeclaredField("remainder")
-        remainderF.isAccessible = true
-        return remainderF.get(this) as Sequence<TokenMatch>
-    }
-
     override fun tryParse(tokens: Sequence<TokenMatch>): ParseResult<R> {
         val innerResult = innerParser.tryParse(tokens)
         return when (innerResult) {
             is ErrorResult -> innerResult
-            is Parsed -> transform(innerResult.value).tryParse(innerResult.sneakyGetRemainder())
+            is Parsed -> transform(innerResult.value).tryParse(innerResult.remainder)
         }
     }
 }

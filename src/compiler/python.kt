@@ -39,14 +39,13 @@ private fun handleSpecialFunctions(func : FunCall) = when(func.id.id) {
     else -> null
 }
 
-private fun String.escaped() : String = buildString {
+private fun String.escaped() : String {
+    val builder = StringBuilder()
     for(c in this@escaped) {
-        val unescaped = escapeChars.entries.find { it.value == c }?.key
-        when(unescaped) {
-            null -> append(c)
-            else -> append("\\$unescaped")
-        }
+        val unescaped = escapeChars.inverse[c] ?: c
+        builder.append(unescaped)
     }
+    return builder.toString()
 }
 
 // Turns a tommy-script expression into its python representation

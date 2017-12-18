@@ -2,9 +2,15 @@ package core.parser
 
 import com.github.h0tk3y.betterParse.combinators.*
 import com.github.h0tk3y.betterParse.grammar.Grammar
-import com.github.h0tk3y.betterParse.grammar.tryParseToEnd
+import io.michaelrocks.bimap.BiMap
+import io.michaelrocks.bimap.HashBiMap
 
-val escapeChars = mapOf('t' to '\t', 'n' to '\n', '\"' to '\"', '\\' to '\\')
+fun<K : Any, V : Any> biMapOf(vararg pairs : Pair<K, V>) : BiMap<K, V> {
+    val ret = HashBiMap<K, V>(pairs.size)
+    pairs.forEach { (k, v) -> ret[k] = v }
+    return ret
+}
+val escapeChars = biMapOf('t' to '\t', 'n' to '\n', '\"' to '\"', '\\' to '\\')
 private val BACKSLASH = """\\"""
 // This is used to generate the regex which matches escape chars
 private val escapeSet = escapeChars.keys.joinToString("") { if(it == '\\') BACKSLASH else "$it" }
