@@ -131,11 +131,11 @@ class TommyParser : Grammar<List<Stmt>>() {
                 infixTokens.inverse[it.type]!!
             }
             val infix = separated(currExprParser, infixOps).map {
-                val associativity = it.separators.firstOrNull()?.associativity ?:
-                        return@map NoSeparator(it)
+                val associativity = it.separators.firstOrNull()?.associativity
                 if(it.separators.any { op -> op.associativity != associativity })
                         return@map MixedAssociativity(it)
                 Parsed(when(associativity) {
+                    null -> it.terms.single()
                     Associativity.LEFT -> it.reduce { lhs, op, rhs -> Infix(op, lhs, rhs) }
                     Associativity.RIGHT -> it.reduceRight { lhs, op, rhs -> Infix(op, lhs, rhs) }
                 }, emptySequence())
