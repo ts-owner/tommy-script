@@ -4,6 +4,7 @@ import com.github.h0tk3y.betterParse.grammar.parseToEnd
 import core.parser.TommyParser
 import interpreter.interpretProgram
 import java.io.File
+import kotlin.system.measureNanoTime
 
 fun main(args: Array<String>) {
     println("------ ACKERMANN ------")
@@ -32,4 +33,18 @@ fun runFile(path : String) {
     val parseResult = TommyParser().parseToEnd(script.inputStream())
 
     interpretProgram(parseResult)
+}
+
+fun runFileTimed(path : String) {
+    val script = File(path)
+    var parseResult : List<Stmt>? = null
+    val timeToParse = measureNanoTime {
+        parseResult = TommyParser().parseToEnd(script.inputStream())
+    }
+    println("Parsing completed in ${timeToParse.toDouble() * 1e-9} seconds\n")
+    val timeToExecute = measureNanoTime {
+        interpretProgram(parseResult!!)
+    }
+    println("\n")
+    println("Execution completed in ${timeToExecute.toDouble() * 1e-9} seconds")
 }
