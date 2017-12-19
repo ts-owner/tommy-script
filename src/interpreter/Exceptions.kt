@@ -15,9 +15,10 @@ class InvalidPassException(msg : String = "", cause : Exception? = null, val wro
     override fun toString() = super.toString() + "\n$wrongStmt didn't undergo $pass"
 }
 
-class UndefinedVariableException(msg : String = "", cause : Exception? = null, val wrongExpr : Expr, val wrongId : String)
+class UndefinedVariableException(msg : String = "", cause : Exception? = null, val wrongExpr : Expr
+                                 , val wrongId : String, val scope: Scope)
     : InterpreterException(msg, cause) {
-    override fun toString() = super.toString() + "\n$wrongId not defined in $wrongExpr"
+    override fun toString() = super.toString() + "\n$wrongId not defined in $wrongExpr with scope $scope"
 }
 
 class IncorrectTypeException(msg : String = "", cause : Exception? = null, val wrongVal : Value)
@@ -35,7 +36,8 @@ class IncorrectArgumentCountException(msg : String = "", cause : Exception? = nu
     }
 }
 
-class RedefineVariableException(msg : String = "", cause : Exception? = null, val wrongStmt : Statement, val wrongId : String)
-    : InterpreterException(msg, cause) {
-    override fun toString() = super.toString() + "\n$wrongStmt attempts to redefine $wrongId"
+class RedefineVariableException(msg : String = "", cause : Exception? = null
+                                , val wrongStmt : Statement, val wrongId : String
+                                , val scope: Scope) : InterpreterException(msg, cause) {
+    override fun toString() = super.toString() + "\n$wrongStmt attempts to redefine $wrongId in scope $scope"
 }

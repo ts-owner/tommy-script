@@ -41,7 +41,9 @@ data class Scope(val local : MutableMap<String, Value> = mutableMapOf(), val par
 
     override fun put(key : String, value : Value) : Value? {
         val oldValue = this[key]
-        if(parent != null && key in parent) {
+        if(key in local) {
+            local[key] = value
+        } else if (parent != null && key in bound) {
             parent[key] = value
         } else {
             local[key] = value

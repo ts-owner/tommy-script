@@ -109,10 +109,10 @@ fun eval(expr : Expr, environment : Scope) : Value = when (expr) {
     is LUnit -> VUnit
     is Prefix -> expr.op.evalOn(expr.arg, environment)
     is Infix -> expr.op.evalOn(expr.lhs, expr.rhs, environment)
-    is Var -> environment[expr.id] ?: throw UndefinedVariableException(wrongExpr = expr, wrongId = expr.id)
+    is Var -> environment[expr.id] ?: throw UndefinedVariableException(wrongExpr = expr, wrongId = expr.id, scope = environment)
     is FunCall -> {
         val func = (environment[expr.id.id] as? VFunction)?.value
-                ?: throw UndefinedVariableException(wrongExpr = expr, wrongId = expr.id.id)
+                ?: throw UndefinedVariableException(wrongExpr = expr, wrongId = expr.id.id, scope = environment)
         if(func.args.size != expr.args.size) throw IncorrectArgumentCountException(wrongCall = expr, called = func)
         val evaledArgs = expr.args.map { argExpr -> eval(argExpr, environment) }
         when(func) {
@@ -134,7 +134,7 @@ fun eval(expr : Expr, environment : Scope) : Value = when (expr) {
     }
     is ArrayAccess -> {
         val (name, indexExpr) = expr
-        val lhs = environment[name.id] ?: throw UndefinedVariableException(wrongExpr = expr, wrongId = name.id)
+        val lhs = environment[name.id] ?: throw UndefinedVariableException(wrongExpr = expr, wrongId = name.id, scope = environment)
         val arr = (lhs as? VArray ?: throw IncorrectTypeException(wrongVal = lhs)).value
         val index = eval(indexExpr, environment).let { evaled ->
             evaled as? VInt ?: throw IncorrectTypeException(wrongVal = evaled)
@@ -161,25 +161,25 @@ fun exec(stmt : Statement, environment : Scope) {
         }
         is VarDef -> {
             val id = stmt.lhs.id
-            if(id in environment.local) throw RedefineVariableException(wrongId = id, wrongStmt = stmt)
+            if(id in environment.local) throw RedefineVariableException(wrongId = id, wrongStmt = stmt, scope = environment)
             val rhs = eval(stmt.rhs, environment)
             environment[id] = rhs
         }
         is UntypedVarDef -> {
             val id = stmt.lhs.id
-            if(id in environment.local) throw RedefineVariableException(wrongId = id, wrongStmt = stmt)
+            if(id in environment.local) throw RedefineVariableException(wrongId = id, wrongStmt = stmt, scope = environment)
             val rhs = eval(stmt.rhs, environment)
             environment[id] = rhs
         }
         is VarReassign -> {
             val id = stmt.lhs.id
-            if(id !in environment) throw UndefinedVariableException(wrongId = id, wrongExpr = Var(id))
+            if(id !in environment) throw UndefinedVariableException(wrongId = id, wrongExpr = Var(id), scope = environment)
             val rhs = eval(stmt.rhs, environment)
             environment[id] = rhs
         }
         is ArrayAssignment -> {
             val (lhs, indexExpr, rhsExpr) = stmt
-            if(lhs.id !in environment) throw UndefinedVariableException(wrongId = lhs.id, wrongExpr = lhs)
+            if(lhs.id !in environment) throw UndefinedVariableException(wrongId = lhs.id, wrongExpr = lhs, scope = environment)
             val arr = environment[lhs.id]!!.let { evaled ->
                 evaled as? VArray ?: throw IncorrectTypeException(wrongVal = evaled)
             }.value
@@ -191,7 +191,8 @@ fun exec(stmt : Statement, environment : Scope) {
         }
         is FunDef -> {
             val (id, args, retTy, body) = stmt
-            if(id.id in environment) throw RedefineVariableException(wrongId = id.id, wrongStmt = stmt)
+            if(id.id in environment) throw RedefineVariableException(wrongId = id.id, wrongStmt = stmt, scope = environment)
+            environment[id.id] = VUnit
             val funcScope = Scope(parent = environment)
             environment[id.id] = VFunction(TommyFunc(id.id, args, retTy, body, funcScope))
         }
@@ -211,7 +212,7 @@ fun exec(stmt : Statement, environment : Scope) {
         }
         is For -> {
             val (id, listExpr, body) = stmt
-            if(id.id in environment) throw RedefineVariableException(wrongId = id.id, wrongStmt = stmt)
+            if(id.id in environment) throw RedefineVariableException(wrongId = id.id, wrongStmt = stmt, scope = environment)
             val list = eval(listExpr, environment).let { evaled ->
                 evaled as? VArray ?: throw IncorrectTypeException(wrongVal = evaled)
             }.value
