@@ -36,12 +36,12 @@ fun typeInfer(context : Map<String, Type>, expr : Expr) : Type {
                 }
             }
             is FunCall -> {
-                val (id, args) = currExpr
-                val (dom, cod) = context[id.id] as? TFunction ?:
-                        err("Function $id not typed at callsite")
+                val (function, args) = currExpr
+                val (dom, cod) = typeInfer(context, function) as? TFunction ?:
+                        err("Function $function not typed at callsite")
                 when {
-                    args.size < dom.size -> err("Not enough arguments provided to $id")
-                    args.size > dom.size -> err("Too many arguments provided to $id")
+                    args.size < dom.size -> err("Not enough arguments provided to $function")
+                    args.size > dom.size -> err("Too many arguments provided to $function")
                     else -> {
                         args.zip(dom) { argExpr, argExpected ->
                             val argActual = rec(argExpr)

@@ -67,8 +67,8 @@ data class Var(val id : String) : Expr()
 // Recursive expression constructors
 data class Prefix(val op : PreOp, val arg : Expr) : Expr()
 data class Infix(val op : InOp, val lhs : Expr, val rhs : Expr) : Expr()
-data class FunCall(val id : Var, val args : List<Expr>) : Expr()
-data class ArrayAccess(val name : Var, val index : Expr) : Expr()
+data class FunCall(val function : Expr, val args : List<Expr>) : Expr()
+data class ArrayAccess(val array : Expr, val index : Expr) : Expr()
 
 // Literals
 sealed class Literal(val ty : Type) : Expr()
@@ -77,6 +77,8 @@ data class LInt(val value : Int) : Literal(TInt)
 data class LString(val value : String) : Literal(TString)
 data class LBool(val value : Boolean) : Literal(TBool)
 data class LArray(val value : List<Expr>) : Literal(TArray)
+data class LFunction(val args : List<Var>, val body : Expr)
+    : Literal(TFunction(args.map { _ -> TAny }, TAny))
 object LUnit : Literal(TUnit)
 
 sealed class Statement
@@ -93,7 +95,7 @@ data class Else(val body : Body) : If()
 data class VarDef(val lhs : AnnotatedVar, val rhs : Expr) : Stmt()
 data class UntypedVarDef(val lhs : Var, val rhs : Expr) : Stmt() //TODO @Brendan this is ugly maybe there's a cleaner way
 data class VarReassign(val lhs : Var, val rhs : Expr) : Stmt()
-data class ArrayAssignment(val lhs : Var, val index : Expr, val rhs : Expr) : Stmt()
+data class ArrayAssignment(val lhs : Expr, val index : Expr, val rhs : Expr) : Stmt()
 data class FunDef(val id : Var, val args : List<AnnotatedVar>, val returnType : Type, val statements : Body) : Stmt()
 data class Return(val toReturn : Expr) : Stmt()
 data class While(val cond : Expr, val body : Body) : Stmt()

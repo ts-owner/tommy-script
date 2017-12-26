@@ -32,7 +32,7 @@ class IncorrectArgumentCountException(msg : String = "", cause : Exception? = nu
     override fun toString() : String {
         val actual = wrongCall.args.size
         val expected = called.args.size
-        return super.toString() + "\n$wrongCall gives $actual number of args, but ${called.id} expects $expected"
+        return super.toString() + "\n$wrongCall gives $actual number of args, but $called expects $expected"
     }
 }
 

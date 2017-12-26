@@ -31,14 +31,6 @@ private fun InOp.toPython() = when(this) {
     InOp.neq -> "!="
 }
 
-// Python names certain functions differently
-private fun handleSpecialFunctions(func : FunCall) = when(func.id.id) {
-    "print" -> "print(${func.args.joinToString(", ", transform = ::compile)}, end='', flush=True)"
-    "concat" -> "${compile(func.args[0])} + ${compile(func.args[1])}"
-    "push" -> "${compile(func.args[0])}.append(${compile(func.args[1])})"
-    else -> null
-}
-
 private fun String.escaped() : String {
     val builder = StringBuilder()
     for(c in this@escaped) {
@@ -53,14 +45,14 @@ private fun compile(expr : Expr) : String = when(expr) {
     is Var -> expr.id // TODO: Name scrambling?
     is Prefix -> "(${expr.op.toPython()} ${compile(expr.arg)})"
     is Infix -> "(${compile(expr.lhs)} ${expr.op.toPython()} ${compile(expr.rhs)})"
-    is FunCall -> handleSpecialFunctions(expr) ?:
-                "${expr.id.id}(${expr.args.joinToString(", ", transform = ::compile)})"
+    is FunCall -> "${compile(expr.function)}(${expr.args.joinToString(", ", transform = ::compile)})"
     is LInt -> "${expr.value}"
     is LString -> "\"${expr.value.escaped()}\""
     is LBool -> if(expr.value) "True" else "False"
     is LArray -> expr.value.joinToString(prefix = "[", postfix = "]", transform = ::compile)
+    is LFunction -> "lambda ${expr.args.joinToString { it.id }}: ${compile(expr.body)}"
     is LUnit -> "None" // TODO: Choose a better representation?
-    is ArrayAccess -> "${expr.name.id}[${compile(expr.index)}]"
+    is ArrayAccess -> "${compile(expr.array)}[${compile(expr.index)}]"
 }
 
 private val indentStr = "    "
@@ -88,7 +80,7 @@ private fun compile(stmt : Stmt, indent : String) : String {
         is VarDef -> "${stmt.lhs.id} = ${compile(stmt.rhs)}"
         is UntypedVarDef -> "${stmt.lhs.id} = ${compile(stmt.rhs)}"
         is VarReassign -> "${stmt.lhs.id} = ${compile(stmt.rhs)}"
-        is ArrayAssignment -> "${stmt.lhs.id}[${compile(stmt.index)}] = ${compile(stmt.rhs)}"
+        is ArrayAssignment -> "${compile(stmt.lhs)}[${compile(stmt.index)}] = ${compile(stmt.rhs)}"
         is FunDef -> {
             val (id, args, _, statements) = stmt
             val argStr = args.joinToString(transform = AnnotatedVar::id)
@@ -111,10 +103,22 @@ private fun compile(stmt : Stmt, indent : String) : String {
 // We only expose the t
 fun compile(stmt : Stmt) = compile(stmt, "")
 
+val builtinFunctions = """
+import sys
+def tommy_print(x):
+    sys.stdout.write(x)
+    sys.stdout.flush()
+__builtins__['print'] = tommy_print
+def push(arr, x):
+    arr.append(x)
+
+"""
+
 fun execByPy(prog : List<Stmt>) {
     val progStr = prog.joinToString(separator = "\n", transform = ::compile)
     val fileName = "tommygen${UUID.randomUUID().toString().replace("-", "")}.py"
     val pyFile = File(fileName)
+    pyFile.writeText(builtinFunctions)
     pyFile.writeText(stdLib.joinToString("\n", transform = ::compile))
     pyFile.appendText("\n")
     pyFile.appendText(progStr)

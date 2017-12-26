@@ -106,18 +106,30 @@ fun eval(expr : Expr, environment : Scope) : Value = when (expr) {
     is LString -> VString(expr.value)
     is LBool -> VBool(expr.value)
     is LArray -> VArray(expr.value.mapTo(mutableListOf()) { eval(it, environment) })
+    is LFunction -> VFunction(LambdaFunc(args = expr.args, body = expr.body, closure = environment))
     is LUnit -> VUnit
     is Prefix -> expr.op.evalOn(expr.arg, environment)
     is Infix -> expr.op.evalOn(expr.lhs, expr.rhs, environment)
     is Var -> environment[expr.id] ?: throw UndefinedVariableException(wrongExpr = expr, wrongId = expr.id, scope = environment)
     is FunCall -> {
-        val func = (environment[expr.id.id] as? VFunction)?.value
-                ?: throw UndefinedVariableException(wrongExpr = expr, wrongId = expr.id.id, scope = environment)
+        val func = eval(expr.function, environment).let { evaled ->
+            evaled as? VFunction ?: throw IncorrectTypeException(wrongVal = evaled)
+        }.value
         if(func.args.size != expr.args.size) throw IncorrectArgumentCountException(wrongCall = expr, called = func)
         val evaledArgs = expr.args.map { argExpr -> eval(argExpr, environment) }
         when(func) {
+            is LambdaFunc -> {
+                val (annArgs, _, body, closure) = func
+                val args = annArgs as List<Var>
+                val argBindings = mutableMapOf<String, Value>()
+                for(i in args.indices) {
+                    val argName = args[i].id
+                    argBindings[argName] = evaledArgs[i]
+                }
+                eval(body, Scope(local = argBindings, parent = closure))
+            }
             is TommyFunc -> {
-                val (_, argAnnIds, _, body, closure) = func
+                val (argAnnIds, _, _, body, closure) = func
                 val argBindings = mutableMapOf<String, Value>()
                 for(i in argAnnIds.indices) {
                     val (argName, _) = argAnnIds[i]
@@ -133,9 +145,10 @@ fun eval(expr : Expr, environment : Scope) : Value = when (expr) {
         }
     }
     is ArrayAccess -> {
-        val (name, indexExpr) = expr
-        val lhs = environment[name.id] ?: throw UndefinedVariableException(wrongExpr = expr, wrongId = name.id, scope = environment)
-        val arr = (lhs as? VArray ?: throw IncorrectTypeException(wrongVal = lhs)).value
+        val (array, indexExpr) = expr
+        val arr = eval(array, environment).let { evaled ->
+            evaled as? VArray ?: throw IncorrectTypeException(wrongVal = evaled)
+        }.value
         val index = eval(indexExpr, environment).let { evaled ->
             evaled as? VInt ?: throw IncorrectTypeException(wrongVal = evaled)
         }.value
@@ -179,8 +192,7 @@ fun exec(stmt : Statement, environment : Scope) {
         }
         is ArrayAssignment -> {
             val (lhs, indexExpr, rhsExpr) = stmt
-            if(lhs.id !in environment) throw UndefinedVariableException(wrongId = lhs.id, wrongExpr = lhs, scope = environment)
-            val arr = environment[lhs.id]!!.let { evaled ->
+            val arr = eval(lhs, environment).let { evaled ->
                 evaled as? VArray ?: throw IncorrectTypeException(wrongVal = evaled)
             }.value
             val index = eval(indexExpr, environment).let { evaled ->
@@ -241,10 +253,10 @@ fun interp(stmt : Stmt, environment : Scope) {
 }
 
 fun interpretProgram(prog : List<Stmt>) {
-    val builtins = mutableMapOf<String, Value>("print" to VFunction(Print),
-                                               "len" to VFunction(Len),
-                                               "str" to VFunction(Str),
-                                               "push" to VFunction(Push))
+    val builtins = mutableMapOf("print" to VFunction(Print) as Value,
+                                "len" to VFunction(Len),
+                                "str" to VFunction(Str),
+                                "push" to VFunction(Push))
     val progScope = Scope(builtins)
     stdLib.forEach { exec(it, progScope) }
     prog.forEach { interp(it, progScope) }

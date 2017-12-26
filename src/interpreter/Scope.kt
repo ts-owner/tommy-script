@@ -60,10 +60,12 @@ data class Scope(val local : MutableMap<String, Value> = mutableMapOf(), val par
 
     override fun putAll(from : Map<out String, Value>) = from.forEach { id, value -> this.put(id, value) }
 
-    fun prettyPrint() : String {
+    override fun toString() : String {
         val parentEntries = parent?.entries ?: mutableSetOf()
-        parentEntries.removeIf { it.key !in bound || it.key in local.keys }
+        parentEntries.removeIf { (id, _) -> id !in bound || id in local.keys }
         parentEntries.addAll(this.local.entries)
-        return parentEntries.joinToString(prefix = "{", postfix = "}") { "${it.key} -> ${it.value}" }
+        return parentEntries.joinToString(prefix = "{", postfix = "}") { (id, value) ->
+            "$id -> $value"
+        }
     }
 }
