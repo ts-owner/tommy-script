@@ -1,6 +1,5 @@
 package core
 
-import com.github.h0tk3y.betterParse.grammar.parseToEnd
 import core.parser.TommyParser
 import java.io.File
 import kotlin.test.assertEquals
@@ -31,7 +30,7 @@ fun main(args: Array<String>) {
 
     if (debug) println(lines)
 
-    val parseResult = TommyParser().parseToEnd(exampleScript.inputStream())
+    val parseResult = TommyParser(exampleScript.inputStream())
 
     interpretProgram(parseResult)
 }

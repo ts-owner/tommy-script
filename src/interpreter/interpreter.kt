@@ -1,7 +1,7 @@
 package interpreter
 
 import core.*
-import standard_library.stdLib
+import stdlib.stdLib
 import java.lang.Math.pow
 
 fun PreOp.evalOn(arg : Expr, environment : Scope) : Value = when(this) {
@@ -186,7 +186,8 @@ fun exec(stmt : Statement, environment : Scope) {
         }
         is VarReassign -> {
             val id = stmt.lhs.id
-            if(id !in environment) throw UndefinedVariableException(wrongId = id, wrongExpr = Var(id), scope = environment)
+            if(id !in environment)
+                throw UndefinedVariableException(wrongId = id, wrongExpr = Var(id), scope = environment)
             val rhs = eval(stmt.rhs, environment)
             environment[id] = rhs
         }

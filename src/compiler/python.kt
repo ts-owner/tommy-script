@@ -2,7 +2,7 @@ package compiler
 
 import core.*
 import core.parser.escapeChars
-import standard_library.stdLib
+import stdlib.stdLib
 import java.io.File
 import java.util.*
 import java.util.concurrent.TimeUnit

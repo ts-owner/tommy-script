@@ -1,8 +1,7 @@
 package interpreter
 
-import com.github.h0tk3y.betterParse.grammar.parseToEnd
 import core.parser.TommyParser
-import standard_library.stdLib
+import stdlib.stdLib
 
 const val prelude: String = "ts> "
 const val quit: String = "--quit"
@@ -18,7 +17,7 @@ fun main(args : Array<String>) {
         print(prelude)
         val line = readLine()
         if(line == null || line == quit) break
-        val prog = TommyParser().parseToEnd(line)[0]
+        val prog = TommyParser(line)[0]
         interp(prog, environment)
         println()
     }
