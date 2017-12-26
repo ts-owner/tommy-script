@@ -11,12 +11,12 @@ fun<K : Any, V : Any> biMapOf(vararg pairs : Pair<K, V>) : BiMap<K, V> {
     return ret
 }
 val escapeChars = biMapOf('t' to '\t', 'n' to '\n', '\"' to '\"', '\\' to '\\')
-private val BACKSLASH = """\\"""
+internal const val BACKSLASH = """\\"""
 // This is used to generate the regex which matches escape chars
 private val escapeSet = escapeChars.keys.joinToString("") { if(it == '\\') BACKSLASH else "$it" }
 
 // Parser for strings which escapes escape characters (e.g. the text \t becomes a tab)
-internal class StringParser : Grammar<String>() {
+internal object StringParser : Grammar<String>() {
     private val ESCAPESEQUENCE by token("$BACKSLASH[$escapeSet]")
     private val QUOTE by token("\"")
     private val CHAR by token("[^$BACKSLASH]")
