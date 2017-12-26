@@ -28,6 +28,9 @@ fun main(args : Array<String>) {
     println("------ LAMBDA ------")
     runFileTimed("examples/lambda.tom")
     println()
+    println("------ GAME OF LIFE ------")
+    runFileTimed("examples/game_of_life.tom")
+    println()
 }
 
 fun runFile(path : String) {
