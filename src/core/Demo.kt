@@ -25,6 +25,9 @@ fun main(args : Array<String>) {
     println("------ MERGE SORT ------")
     runFileTimed("examples/merge_sort.tom")
     println()
+    println("------ LAMBDA ------")
+    runFileTimed("examples/lambda.tom")
+    println()
 }
 
 fun runFile(path : String) {

@@ -1,13 +1,13 @@
-let test = [true,3,0,0,0,0,0,0,0,0,0,0,0,0]
-test[3] = "asdasd"
-println(test[3])
-let x = 0
+let test = [true, 3, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0];
+test[3] = "asdasd";
+println(test[3]);
+let x = 0;
 while x < 10 do
-    x = x + 1
-    test[x] = "index " ++ str(x)
+    x = x + 1;
+    test[x] = "index " ++ str(x);
     if x % 2 == 0 then
-        println(x)
+        println(x);
     else
-        println(test[x])
-    end
-end
+        println(test[x]);
+    end;
+end;

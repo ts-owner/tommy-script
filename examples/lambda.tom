@@ -1,0 +1,21 @@
+let print_succ = λx -> println(x + 1 + offset);
+let print_minus = \x, y -> println(x - y + offset);
+
+let offset = 19;
+
+let mutate(x : Int) : Int =
+    offset = x;
+    return x;
+end;
+
+print_succ(mutate(1));
+print_minus(mutate(3), 2);
+(\x -> x)(0);
+let int_map(transform : (Int) -> Int, array : [Int]) : [Int] =
+    let ret = [];
+    for elem in array do
+        push(ret, transform(elem));
+    end;
+    return ret;
+end;
+println(int_map(\ x -> x + 1, [1,2,3]));
