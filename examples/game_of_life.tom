@@ -1,0 +1,121 @@
+let range(start_inclusive : Int, end_exclusive : Int) : [Int] =
+    let ret = [];
+    let i = start_inclusive;
+    while i < end_exclusive do
+        push(ret, i);
+        i = i + 1;
+    end;
+    return ret;
+end;
+
+let mk_conway(initial_state : [[Bool]]) : () -> Unit =
+    let height = len(initial_state);
+    let row_indices = range(0, height);
+    let width = len(initial_state[0]);
+    let col_indices = range(0, width);
+
+    let grid_copy(from : [[Bool]], to : [[Bool]]) : Unit =
+        for r in row_indices do
+            for c in col_indices do
+                to[r][c] = from[r][c];
+            end;
+        end;
+    end;
+
+    let mk_aux() : [[Bool]] =
+        let aux = [];
+
+        for r in row_indices do
+            push(aux, []);
+            for c in col_indices do
+                push(aux[r], false);
+            end;
+        end;
+
+        return aux;
+    end;
+
+    let neighbor_count(cells : [[Bool]], r : Int, c : Int) : Int =
+        let count = 0;
+
+        let has_up_margin    = 0 < r;
+        let has_right_margin = c < width - 1;
+        let has_down_margin  = r < height - 1;
+        let has_left_margin  = 0 < c;
+
+        if has_up_margin then
+            if has_left_margin and cells[r - 1][c - 1] then count = count + 1; end;
+            if cells[r - 1][c] then count = count + 1; end;
+            if has_right_margin and cells[r - 1][c + 1] then count = count + 1; end;
+        end;
+        if has_left_margin and cells[r][c - 1] then count = count + 1; end;
+        if has_right_margin and cells[r][c + 1] then count = count + 1; end;
+        if has_down_margin then
+            if has_left_margin and cells[r + 1][c - 1] then count = count + 1; end;
+            if cells[r + 1][c] then count = count + 1; end;
+            if has_right_margin and cells[r + 1][c + 1] then count = count + 1; end;
+        end;
+
+        return count;
+    end;
+
+    let step(cells : [[Bool]], aux : [[Bool]]) : Unit =
+        grid_copy(cells, aux);
+        let old = aux;
+        for r in row_indices do
+            for c in col_indices do
+                let living_neighbors = neighbor_count(old, r, c);
+                let was_alive = old[r][c];
+                if was_alive then
+                    cells[r][c] = living_neighbors == 2 or living_neighbors == 3;
+                else
+                    cells[r][c] = living_neighbors == 3;
+                end;
+            end;
+        end;
+    end;
+
+    let print_grid(cells : [[Bool]]) : Unit =
+        for row in cells do
+            for cell in row do
+                if cell then
+                    print("*");
+                else
+                    print(".");
+                end;
+            end;
+            println("");
+        end;
+    end;
+
+    let cells = initial_state;
+    let aux = mk_aux();
+
+    let exposed() : Unit =
+        print_grid(cells);
+        step(cells, aux);
+    end;
+
+    return exposed;
+end;
+
+let demo_grid = [[false, false, false, false, false, false, false, false, false],
+                 [false, false, false, false, false, false, false, false, false],
+                 [false, true , false, false, false, false, false, false, false],
+                 [false, false, true , false, false, true , true , true , false],
+                 [true , true , true , false, false, false, false, false, false],
+                 [false, false, false, false, false, false, false, false, false],
+                 [false, false, false, false, false, false, false, false, false],
+                 [false, false, false, false, false, false, false, false, false],
+                 [false, false, false, false, false, false, false, false, false]];
+
+let next_generation = mk_conway(demo_grid);
+let num_generations = 10;
+
+for i in range(0, num_generations) do
+    print("Generation ");
+    print(i);
+    println(":");
+    next_generation();
+    println("");
+end;

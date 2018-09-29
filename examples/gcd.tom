@@ -1,8 +1,9 @@
-let test: String = "aldlkjfa"
+let test: String = "aldlkjfa";
 let gcd(x: Int, y: Int):Int =
-    if(y==0) then return x
-    else return gcd(y, x%y) end
-end
+    if(y==0) then return x;
+    else return gcd(y, x%y);
+    end;
+end;
 
-println(gcd(54,24))
-println(gcd(48,180))
+println(gcd(54,24));
+println(gcd(48,180));

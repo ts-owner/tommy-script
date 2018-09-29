@@ -15,7 +15,8 @@ repositories {
 dependencies {
     compile "org.jetbrains.kotlin:kotlin-stdlib-jre8:$kotlin_version"
     compile "org.jetbrains.kotlin:kotlin-test:$kotlin_version"
-    compile 'com.github.h0tk3y.betterParse:better-parse:0.2.1'
+    compile 'com.github.h0tk3y.betterParse:better-parse:0.3.2'
+    compile 'io.michaelrocks:bimap:1.0.2'
 }
 sourceSets {
     main.kotlin.srcDirs += "src/"

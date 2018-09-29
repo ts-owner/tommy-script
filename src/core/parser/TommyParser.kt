@@ -1,42 +1,54 @@
 package core.parser
 
 import com.github.h0tk3y.betterParse.combinators.*
-import com.github.h0tk3y.betterParse.grammar.Grammar
-import com.github.h0tk3y.betterParse.grammar.parser
-import com.github.h0tk3y.betterParse.grammar.tryParseToEnd
+import com.github.h0tk3y.betterParse.grammar.*
+import com.github.h0tk3y.betterParse.lexer.TokenMatch
 import com.github.h0tk3y.betterParse.parser.*
 import core.*
+import java.io.InputStream
+import java.util.*
 
-class TommyParser : Grammar<List<Stmt>>() {
-    //Symbols
+// Main parser for a program
+object TommyParser : Grammar<List<Stmt>>() {
+    // Symbols
     private val LPAR by token("\\(")
     private val RPAR by token("\\)")
     private val LBRA by token("\\[")
-    private val RBRA by token("\\]")
-    private val EQU by token("==")
+    private val RBRA by token("]")
+    private val COLON by token(":")
+    private val ARROW by token("->|\u2192") // 0x2192 is the charchode for latex's \rightarrow
+    private val LAMBDA by token("[$BACKSLASH\u03bb]") // 0x03bb is the charchode for lambda
+    private val LET by token("let\\b")
+
+    // Operators
+    private val EQOP by token("==")
     private val NEQ by token("!=")
     private val LEQ by token("<=")
     private val GEQ by token(">=")
     private val LT by token("<")
     private val GT by token(">")
-    private val COLON by token(":")
-    private val LET by token("let\\b")
-    private val EQUALS by token("=")
-    private val CONCAT by token("\\+\\+")
-    private val PLUS by token("\\+")
-    private val MINUS by token("\\-")
+    private val CONCAT by token("""\+\+""")
+    private val PLUS by token("""\+""")
+    private val MINUS by token("-")
     private val DIV by token("/")
     private val MOD by token("%")
-    private val POW by token("\\*\\*")
-    private val TIMES by token("\\*")
-    private val OR by token("or")
-    private val AND by token("and\\b")
+    private val POW by token("""\*\*""")
+    private val TIMES by token("""\*""")
+    private val OR by token("""or\b""")
+    private val AND by token("""and\b""")
+    private val NOT by token("""not\b""")
     private val COMMA by token(",")
+    private val EQUALS by token("=")
 
-    //keywords
-    private val NOT by token("not\\b") //@Brendan maybe not should require a space after/before it?
+    // Literals
+    private val NUM by token("\\d+")
+    private val STRING by token("\"[^\"]*\"")
+    private val BOOL by token("true|false")
+    private val UNIT by token("unit")
+
+    // Keywords
     private val RETURN by token("return\\b")
-    private val END by token("end")
+    private val END by token("end(?!\\w)")
     private val IF by token("if\\b")
     private val THEN by token("then\\b")
     private val ELSE by token("else\\b")
@@ -46,202 +58,129 @@ class TommyParser : Grammar<List<Stmt>>() {
     private val DO by token("\\bdo")
     private val IN by token("in\\b")
 
-    //Literals
-    private val NUM by token("\\d+")
-    private val STRING by token("\".*\"")
-    private val TRUE by token("true")
-    private val FALSE by token("false")
-    private val UNIT by token("unit")
-
-    //types
+    // Types
     private val stringSymbol by token("String")
     private val intSymbol by token("Int")
     private val boolSymbol by token("Bool")
     private val unitSymbol by token("Unit")
+    private val separator by token(";")
 
     private val id by token("\\w+")
 
     private val ws by token("\\s+", ignore = true)
 
-    //LEXER OVER
-
     private val idParser = id use { text }
+    private val varParser = idParser.map(::Var)
+    private val separatorParser = oneOrMore(separator)
 
     private val arrayTypeParser = -LBRA and parser(this::typeParser) and -RBRA map { TArray }
+    private val functionTypePatser = -LPAR and separatedTerms(parser(this::typeParser), COMMA
+                                                             , acceptZero = true) and -RPAR and
+                                     -ARROW and parser(this::typeParser) map { (dom, cod) -> TFunction(dom, cod) }
 
-    //Parses a string to a TString or an int to a TInt or a boolean to a TBool
     private val typeParser : Parser<Type> = stringSymbol.asJust(TString) or
             intSymbol.asJust(TInt) or
             boolSymbol.asJust(TBool) or
             unitSymbol.asJust(TUnit) or
-            arrayTypeParser
+            arrayTypeParser or
+            functionTypePatser
 
-    //Parses things like escape characters
-    private val stringParser = STRING.map { match -> StringParser().tryParseToEnd(match.text) }
-                                     .join().map(::LString)
-
-    private val numParser = NUM use { LInt(text.toInt()) } //Parses numbers into LInts
-    private val boolParser = TRUE.asJust(LBool(true)) or FALSE.asJust(LBool(false))
-    private val unitParser = UNIT.asJust(LUnit)
-    
-    //Any amount of non-white-space followed by a ( and any number of parameters (`acceptZero = true` means it can be no parameters) and a )
-    //Maps the parameters (`args`) and function name (`name.text`) to a function call
-    private val funCallParser = id and -LPAR and
-                                separatedTerms(parser(this::expr), COMMA, acceptZero = true) and
-                                -RPAR map { (name, args) -> FunCall(Var(name.text), args) }
-
-    //Maps any non-white-space to a variable
-    private val varParser = idParser.map(::Var)
-
-    private val arrayLiteralParser = -LBRA and separatedTerms(parser(this::expr), COMMA, acceptZero = true) and -RBRA map { LArray(it.toMutableList()) }
-
-    private val arrayGetParser = varParser and -LBRA and parser(this::expr) and -RBRA map { (name, index) -> ArrayAccess(name, index) }
-
-    private val literalParser = stringParser or numParser or boolParser or unitParser or arrayLiteralParser
-
-    //switch out preexper thing with parser(this::expr) later, if it works with preexpr
-    private val preexpr = literalParser or funCallParser or arrayGetParser or varParser or arrayLiteralParser or
-                          (-LPAR and parser(this::expr) and -RPAR)
-
-    //TODO move this somewhere else
-    private val whileParser = -WHILE and parser(this::expr) and
-                                           -DO and zeroOrMore(parser(this::statement)) and
-                                           -END map{(cond, statement) -> While(cond, statement)}
-    private val forParser = -FOR and idParser and -IN and parser(this::expr) and
-            -DO and zeroOrMore(parser(this::statement)) and
-            -END map{(elem, list, body) -> For(Var(elem), list, body)}
-
-    //operators zone
-    //The operators with the highest number in the operator chain happen first. Eg: power function > plus/minus
-    //TODO make this not seizure material
-
-    //make the levels general. maybe need to pull request/add something
-    //make it so there can't be a space between
-
-    //POWER FUNCTION (**)
-    val lvFourteenOperatorChain: Parser<Expr> = leftAssociative(preexpr, POW) { l, o, r ->
-        // use o for generalization
-        Infix(InOp.power, l, r)
+    private val annotatedVarParser = idParser and -COLON and typeParser map {
+        (ident, type) -> AnnotatedVar(ident, type)
     }
 
-    //PLUS AND MINUS INVERT EACH OTHER
-    val lvThirteenOperatorChain: Parser<Expr> = (PLUS or MINUS) * lvFourteenOperatorChain map { (a, b) ->
-        Prefix(if (a.type == PLUS) PreOp.plus else PreOp.negate, b)
+    private object ExprParser : PrattParser() {
+        private const val HIGHEST_PRECEDENCE = 100
+        private const val COMMA_BP = 1
+        private const val LITERAL_BP = -1
+
+        private val prefixTokens =
+                mapOf(MINUS to PreOp.negate, PLUS to PreOp.plus, NOT to PreOp.not)
+        private val infixTokens =
+                mapOf(PLUS to InOp.plus, MINUS to InOp.subtract, TIMES to InOp.times,
+                      DIV to InOp.div, MOD to InOp.mod, POW to InOp.power, CONCAT to InOp.concat,
+                      AND to InOp.and, OR to InOp.or, EQOP to InOp.eqInt, LT to InOp.lt,
+                      GT to InOp.gt, LEQ to InOp.leq, GEQ to InOp.geq, NEQ to InOp.neq)
+
+        private fun prefixNUD(op : PreOp) : NUD = { _, bp ->
+            parser(bp).map { arg -> Prefix(op, arg) }
+        }
+        private fun infixLED(op : InOp) : LED = { _, left, bp ->
+                parser(bp).map { right -> Infix(op, left, right) }
+        }
+        private fun literalNUD(mkLit : (String) -> Expr) : NUD =
+                { match, _ -> pure(mkLit(match.text)) }
+
+        override fun makeExpressionParser() : Parser<Expr> {
+            registerLeft(HIGHEST_PRECEDENCE, LPAR) { _, left, _ ->
+                separated(this.parser(COMMA_BP), COMMA, acceptZero = true) and -RPAR map { FunCall(left, it.terms) }
+            }
+            registerLeft(HIGHEST_PRECEDENCE, LBRA) { _, left, _ ->
+                parser() and -RBRA map { idx -> ArrayAccess(left, idx) }
+            }
+            prefixTokens.forEach { (tok, op) -> registerNull(op.precedence, tok, prefixNUD(op)) }
+            infixTokens.forEach { (tok, op) ->
+                when(op.associativity) {
+                    Associativity.LEFT -> registerLeft(op.precedence, tok, infixLED(op))
+                    Associativity.RIGHT -> registerRightAssoc(op.precedence, tok, infixLED(op))
+                }
+            }
+            registerNull(0, LPAR) { _, bp -> parser(bp) and -RPAR }
+            registerNull(LITERAL_BP, id, literalNUD { Var(it) })
+            registerNull(LITERAL_BP, NUM, literalNUD { LInt(it.toInt()) })
+            registerNull(LITERAL_BP, BOOL, literalNUD { LBool(it.toBoolean()) })
+            registerNull(LITERAL_BP, UNIT, literalNUD { LUnit })
+            registerNull(LITERAL_BP, STRING) { match, _ ->
+                StringParser.tryParseToEnd(match.text).let {
+                    when(it) {
+                        is Parsed -> pure(LString(it.value))
+                        is ErrorResult -> fail(it)
+                    }
+                }
+            }
+            registerNull(LITERAL_BP, LAMBDA) { _, bp ->
+                separated(varParser, COMMA, acceptZero = true) and -ARROW and parser(bp) map {
+                    (argSep, body) -> LFunction(argSep.terms, body)
+                }
+            }
+            registerNull(LITERAL_BP, LBRA) { _, _ ->
+                separated(parser(COMMA_BP), COMMA, acceptZero = true) and -RBRA map { LArray(it.terms) }
+            }
+            return parser()
+        }
     }
 
-    //MODULUS (%)
-    var lvTwelveOperatorChain: Parser<Expr> = leftAssociative(lvThirteenOperatorChain or lvFourteenOperatorChain, MOD) { l, o, r ->
-        Infix(InOp.mod, l, r)
+    private val expr = ExprParser.makeExpressionParser()
+
+    private val arraySetParser = expr guard { it is ArrayAccess } and -EQUALS and expr map {
+        (arrayAccess, elem) -> (arrayAccess as ArrayAccess).let {
+            (array, index) -> ArrayAssignment(array, index, elem)
+        }
     }
 
-    //give alternative path around prefix operator
-    //MULTIPLICATION AND DIVISION (* and /)
-    val lvElevenOperatorChain: Parser<Expr> = leftAssociative(lvThirteenOperatorChain or lvTwelveOperatorChain, (DIV or TIMES)) { l, o, r ->
-        Infix(if (o.type == DIV) InOp.div else InOp.times, l, r)
+    private val whileParser = -WHILE and expr and
+            -DO and parser(this::bodyParser) and
+            -END map { (cond, statement) -> While(cond, statement) }
+    private val forParser = -FOR and idParser and -IN and expr and
+            -DO and parser(this::bodyParser) and
+            -END map { (elem, list, body) -> For(Var(elem), list, body) }
+
+    private val varDefParser = -LET and annotatedVarParser and -EQUALS and expr map { (a, b) -> VarDef(a, b) }
+    private val untypedVarDefParser = -LET and varParser and -EQUALS and expr map { (a, b) -> UntypedVarDef(a, b) }
+
+    private val varReassignParser = varParser and -EQUALS and expr map { (a, b) -> VarReassign(a, b) }
+
+    private val definitionArgsParser = -LPAR and separatedTerms(annotatedVarParser, COMMA, acceptZero = true) and -RPAR
+    private val funDefParser = -LET and varParser and definitionArgsParser and -COLON and typeParser and -EQUALS and
+            parser(this::bodyParser) and -END map { (funName, args, retType, children) ->
+        FunDef(funName, args, retType, children)
     }
 
-    //PLUS AND MINUS (+ and -)
-    val lvTenOperatorChain: Parser<Expr> = leftAssociative(lvElevenOperatorChain, (PLUS or MINUS)) { l, o, r ->
-        Infix(if (o.type == PLUS) InOp.plus else InOp.subtract, l, r)
-    }
-
-    //Defining characters as their actual functions (the characters being == and != and <= and >= and < and > )
-    val lvNineOperatorSymbols = EQU or NEQ or LEQ or GEQ or LT or GT
-    private val tokenToOperator = mapOf(
-            EQU to InOp.eqInt, NEQ to InOp.neq, LEQ to InOp.leq, GEQ to InOp.geq, LT to InOp.lt, GT to InOp.gt
-    )
-    //COMPARER TOKENS ( == and != and <= and >= and < and > )
-    val lvNineOperatorChain: Parser<Expr> = leftAssociative(lvTenOperatorChain, lvNineOperatorSymbols) { l, o, r ->
-        Infix(tokenToOperator[o.type]!!, l, r)
-    }
-
-    //NOT
-    val lvSixOperatorChain: Parser<Expr> = NOT * lvNineOperatorChain map { (a, b) ->
-        Prefix(PreOp.not, b)
-    }
-    //give alternative path around prefix operator
-    //AND
-    val lvFiveOperatorChain: Parser<Expr> = leftAssociative(lvSixOperatorChain or lvNineOperatorChain, AND) { l, _, r ->
-        Infix(InOp.and, l, r)
-    }
-
-    //OR
-    val lvFourOperatorChain: Parser<Expr> = leftAssociative(lvFiveOperatorChain, OR) { l, _, r ->
-        Infix(InOp.or, l, r)
-    }
-
-    //CONCAT
-    val lvThreeOperatorChain: Parser<Expr> = leftAssociative(lvFourOperatorChain, CONCAT) { l, _, r ->
-        Infix(InOp.concat, l, r)
-    }
-
-
-    //The chain works by calling lvFourOperatorChain, which in turn calls lvFiveOperatorChain and then does its thing.
-    // But lvFiveOperatorChain calls lvSixOperatorChain, etc.
-    private val expr = lvThreeOperatorChain
-    //end operators zone
-
-    private val arraySetParser = varParser and -LBRA and parser(this::expr) and -RBRA and -EQUALS and
-            parser(this::expr) map { (name, index, newObj) -> ArrayAssignment(name, index, newObj)}
-
-    //Types a variable
-    //x: String
-    //x: Bool
-    //x: Int
-    private val annotatedVarParser = idParser and -COLON and typeParser map { (a, b) ->
-        AnnotatedVar(a, b)
-    }
-
-    //Creates a variable with a type
-    //let x: String = "test"
-    //let x: Boolean = true
-    //let x: Int = 3
-    private val varDefParser = -LET and annotatedVarParser and -EQUALS and expr map { (a, b) ->
-        VarDef(a, b)
-    }
-
-    //Creates a new variable without a type
-    //let x = "test"
-    //let x = false
-    //let x = 3
-    private val untypedVarDefParser = -LET and varParser and -EQUALS and expr map { (a, b) ->
-        UntypedVarDef(a, b)
-    }
-
-    //Reassigns a variable to a new value
-    //x = "test2"
-    private val varReassignParser = varParser and -EQUALS and expr map { (a, b) ->
-        VarReassign(a, b)
-    }
-
-    //Declares a function
-    //let multiply (a: Int, b: Int):Int =
-        //return (a * b)
-        //end
-    //let printWord (a: String) =
-        //print (a)
-        //end
-    private val funDefParser = -LET and idParser and
-            -LPAR and separatedTerms(annotatedVarParser, COMMA, acceptZero = true) and -RPAR and
-            -COLON and typeParser and -EQUALS and
-            zeroOrMore(parser(this::statement)) and
-            -END map { (funName, args, retType, children) ->
-        FunDef(Var(funName), args, retType, children)
-    }
-
-    //Returns something
-    //return (a * b)
     private val returnParser = -RETURN and expr.map(::Return)
 
-    //An if (and optional else)
-    //if (a == 3) then
-        //return "yes"
-    //else
-        //return "no"
-    //end
-    private val elseifParser = -ELSEIF and expr and -THEN and zeroOrMore(parser(this::statement))
-    private val ifParser = -IF and expr and -THEN and zeroOrMore(parser(this::statement)) and
-             zeroOrMore(elseifParser) and optional(-ELSE and zeroOrMore(parser(this::statement))) and
+    private val elseifParser = -ELSEIF and expr and -THEN and parser(this::bodyParser)
+    private val ifParser = -IF and expr and -THEN and parser(this::bodyParser) and
+             zeroOrMore(elseifParser) and optional(-ELSE and parser(this::bodyParser)) and
             -END map { (cond, body, elifs, elsebody) ->
                 val elseBranch : If? = elsebody?.let { Else(it) }
                 val elseIfs = elifs.foldRight(elseBranch) { (currCond, currBody), next ->
@@ -252,10 +191,16 @@ class TommyParser : Grammar<List<Stmt>>() {
 
     private val loneExprParser = expr.map(::EvalExpr)
 
-    //A statement is either return or a typed variable declaration or an untyped variable declaration or a function or reassigning a variable or an if
-    //return (a * b)
     private val statement : Parser<Statement> = returnParser or varDefParser or untypedVarDefParser or funDefParser or
             varReassignParser or ifParser or whileParser or forParser or arraySetParser or loneExprParser
 
-    override val rootParser = oneOrMore(statement) //TODO make this correct
+    private val bodyParser = (separatedTerms(statement, separatorParser) and -separatorParser) or
+            pure(emptyList())
+    override val rootParser = bodyParser
+
+    operator fun invoke(tokens : Sequence<TokenMatch>) = parseToEnd(tokens)
+    operator fun invoke(tokens : String) = parseToEnd(tokens)
+    operator fun invoke(tokens : Scanner) = parseToEnd(tokens)
+    operator fun invoke(tokens : Readable) = parseToEnd(tokens)
+    operator fun invoke(tokens : InputStream) = parseToEnd(tokens)
 }

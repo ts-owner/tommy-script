@@ -1,33 +1,31 @@
 let printArr(arr : [Int]) : Unit =
-    print("[")
-    if len(arr) == 0 then
-        println("]")
-    else
-        let flag = true
+    print("[");
+    if len(arr) > 0 then
+        let flag = true;
         for x in arr do
             if flag then
-                print(x)
-                flag = false
+                print(x);
+                flag = false;
             else
-                print(", ")
-                print(x)
-            end
-        end
-        println("]")
-    end
-end
+                print(", ");
+                print(x);
+            end;
+        end;
+    end;
+    println("]");
+end;
 
-let test = [3]
-printArr(test)
-let test1 = [5,6]
-printArr(test1)
-printArr(cons(concat(test, test1), 5))
-printArr(test)
-printArr(test1)
+let test = [3];
+printArr(test);
+let test1 = [5,6];
+printArr(test1);
+printArr(cons(concat(test, test1), 5));
+printArr(test);
+printArr(test1);
 
-push(test, 4)
-printArr(test)
-printArr(test1)
+push(test, 4);
+printArr(test);
+printArr(test1);
 
-let array = cons(concat(test, test1), 4)
-printArr(array)
+let array = cons(concat(test, test1), 4);
+printArr(array);
